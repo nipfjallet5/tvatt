@@ -1,0 +1,19 @@
+{
+  "name": "tvatt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tvatt.js",
+  "scripts": {
+    "dev": "webpack server",
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^5.3.2",
+    "webpack": "^5.50.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^3.11.2"
+  }
+}

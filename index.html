@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tvättstugan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">-->
+    <!--<meta http-equiv="Pragma" content="no-cache">-->
+    <!--<meta http-equiv="Expires" content="0">-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/4.0.12/Dropbox-sdk.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.css" />
+
+    <!--<script src="http://cdn.rawgit.com/jquery/jquery-ui/1.10.4/ui/jquery.ui.datepicker.js"></script>-->
+    <!--<script id="mobile-datepicker" src="http://cdn.rawgit.com/arschmitz/jquery-mobile-datepicker-wrapper/v0.1.1/jquery.mobile.datepicker.js"></script>-->
+    <!--<link rel="stylesheet" href="http://cdn.rawgit.com/arschmitz/jquery-mobile-datepicker-wrapper/v0.1.1/jquery.mobile.datepicker.css">-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile-datebox/1.1.1/jqm-datebox.comp.calbox.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile-datebox/1.1.1/jqm-datebox.core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile-datebox/1.1.1/jqm-datebox.mode.calbox.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile-datebox/1.1.1/jqm-datebox.min.css" />
+
+    <link rel="SHORTCUT ICON" href="/assets/images/washing-machine-xxl.png" />
+    <link rel="icon" href="/assets/images/washing-machine-xxl.png" type="image/png" />
+
+    <style>
+        body {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+        }
+        .apartment-selector {text-align: left}
+        input[type=number] {
+            -webkit-text-security: disc;
+            text-align: center;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        #content {
+            padding: 0;
+        }
+        .password {
+            width: 100px;
+        }
+        #password {
+            text-shadow: none;
+        }
+        .password-valid {
+            background-color: green !important;
+            color: white !important;
+        }
+        .password-invalid {
+            background-color: red !important;
+            color: white !important;
+        }
+        .label {
+            padding: 5px;
+            margin: 0 auto;
+            width: 100px;
+            text-align: center;
+        }
+        .center-wrapper{
+            padding: 5px;
+            text-align: center;
+        }
+        .center-wrapper * {
+            margin: 0 auto;
+        }
+        #apartmentList {
+            text-align: center;
+        }
+        .ui-datebox-gridminus {
+            margin-left: 10px;
+        }
+        .ui-datebox-container {
+            left: 10px !important;
+            top: 10px !important;
+            border: none !important;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div id="appPage" data-role="page">
+    <div data-role="panel" id="infoPanel" data-display="overlay">
+        <h3>Tvättstugebokning för Nipfjället 5</h3>
+
+        <ul>
+            <li>Ett tvättpass får bestå av max 4 timmar</li>
+            <li>Gröna tider är bokade av dig</li>
+            <li>Röda tider är bokade av någon annan</li>
+            <li>Boka genom att klicka på en tom tid</li>
+            <li>Avboka genom att klicka på en grön bokad tid</li>
+        </ul>
+        <!-- panel content goes here -->
+    </div>
+
+    <div data-role="popup" id="popupBasic">
+        <!--<p>This is a completely basic popup, no options set.</p>-->
+        <div class="center-wrapper">
+            <div>
+                <div class="label">Ange kod för att se namn.</div>
+                <!--<input id="password" type="password" pattern="[0-9]*" inputmode="numeric">-->
+                <input data-wrapper-class="password" data-clear-btn="false" name="password-1" id="popupPassword" value="" autocomplete="off" maxlength="4" type="number">
+            </div>
+            <!--<input data-wrapper-class="infoButton" id="info" type="button" value="avbryt">-->
+        </div>
+    </div>
+
+    <!--<div data-role="popup" id="popupDatePicker">-->
+        <!--<input type="text" data-role="datebox" data-options='{"mode":"calbox"}'>-->
+    <!--</div>-->
+
+    <div id="content" data-role="content">
+
+        <div class="center-wrapper">
+            <div>
+                <div class="label">Kod:</div>
+                <!--<input id="password" type="password" pattern="[0-9]*" inputmode="numeric">-->
+                <input data-wrapper-class="password" data-clear-btn="false" name="password-1" id="password" value="" autocomplete="off" maxlength="4" type="number">
+            </div>
+        </div>
+        <div id="apartmentList">
+        </div>
+    </div>
+</div>
+
+<div id="debug"></div>
+
+<script src="tvatt.js"></script>
+
+</body>
+</html>
+
