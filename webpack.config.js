@@ -6,14 +6,15 @@ module.exports = {
     mode: 'development',
     context: path.join(__dirname, 'src'),
     entry: {
-        tvattlib: path.join(__dirname, '/src/tvattlib.js'),
+        app: path.join(__dirname, '/src/app.js')
+        // tvattlib: path.join(__dirname, '/src/tvattlib.js'),
     },
     output: {
-        filename: '[name].js',
+        filename: 'app.js',
         path: path.join(__dirname, '.'),
-        crossOriginLoading: 'anonymous',
-        library: 'tvattlib',
-        libraryTarget: 'umd'
+        // crossOriginLoading: 'anonymous',
+        // library: 'tvattlib',
+        // libraryTarget: 'umd'
     },
     // resolve: {
     //     fallback: { "crypto": false, "path": false, "fs": false}
@@ -59,8 +60,9 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: 'tvatt.html',
-            chunks: ['tvatt']
+            filename: 'index.html',
+            template: 'app.html',
+            chunks: ['app']
         }),
     ]
 };
