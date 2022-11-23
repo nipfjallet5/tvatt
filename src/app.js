@@ -600,7 +600,7 @@ let accessToken = "U2FsdGVkX189p19Ob4DSM/9t8eIFgKOYYEKDM4ekNsC4VsMFP3pxSm7jPgao6
 
 let fetchApartmentInfo = function(password){
     let fetchTask = new $.Deferred();
-    $.get('/assets/enc/data.json.enc', data => {
+    $.get('assets/enc/data.json.enc', data => {
         try {
             fetchTask.resolve(JSON.parse(CryptoJS.AES.decrypt(data, password).toString(CryptoJS.enc.Utf8)));
         }
