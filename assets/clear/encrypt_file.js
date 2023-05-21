@@ -19,12 +19,6 @@ function decryptFileBase64(inFile, outFile, password) {
 }
 
 function encryptFile(inFile, outFile, password) {
-    console.log('a',inFile);
-    console.log('b',outFile);
-    console.log('c',password);
-    console.log('d',fs.readFileSync(inFile).toString());
-    console.log('e',CryptoJS.AES.encrypt(fs.readFileSync(inFile).toString(), password).toString());
-    
     fs.writeFileSync(outFile, CryptoJS.AES.encrypt(fs.readFileSync(inFile).toString(), password).toString())
 }
 
