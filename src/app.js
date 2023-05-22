@@ -656,31 +656,31 @@ class Booking extends HTMLElement {
             // console.log('found', data[1].matches);
             if (data[0].matches.length === 0) {
 
-                const rightNow = new Date();
-                rightNow.setHours(0);
-                rightNow.setMinutes(0);
-                rightNow.setSeconds(0);
-                rightNow.setMilliseconds(0);
-                const olderBookings = {};
-                Object.entries(allBookings).filter(([key, value]) => value.apartment === this.data.apartment).forEach(([key, value]) => {
-                    console.log(key, value.data);
-                    const bookingDate = new Date(value.year, value.month-1, value.day);
-                    // olderBookingExists = olderBookingExists || (bookingDate < rightNow);
-                    const olderBookingKey = `${value.year}_${value.month-1}_${value.day}`;
-                    if (bookingDate < rightNow) {
-                        if (!olderBookings.hasOwnProperty(olderBookingKey)) olderBookings[olderBookingKey] = [];
-                        olderBookings[olderBookingKey].push(value);
-                    }
-                })
-                if (Object.keys(olderBookings).length > 0) {
-                    this.remove();
-                    $('#oldBookingsList').html('');
-                    Object.entries(olderBookings).forEach(([name,ob]) => {
-                        $('#oldBookingsList').append(new OlderBooking(ob,name));
-                    })
-                    $('#dialogPanel').panel('open');
-                }
-                else {
+                // const rightNow = new Date();
+                // rightNow.setHours(0);
+                // rightNow.setMinutes(0);
+                // rightNow.setSeconds(0);
+                // rightNow.setMilliseconds(0);
+                // const olderBookings = {};
+                // Object.entries(allBookings).filter(([key, value]) => value.apartment === this.data.apartment).forEach(([key, value]) => {
+                //     console.log(key, value.data);
+                //     const bookingDate = new Date(value.year, value.month-1, value.day);
+                //     // olderBookingExists = olderBookingExists || (bookingDate < rightNow);
+                //     const olderBookingKey = `${value.year}_${value.month-1}_${value.day}`;
+                //     if (bookingDate < rightNow) {
+                //         if (!olderBookings.hasOwnProperty(olderBookingKey)) olderBookings[olderBookingKey] = [];
+                //         olderBookings[olderBookingKey].push(value);
+                //     }
+                // })
+                // if (Object.keys(olderBookings).length > 0) {
+                //     this.remove();
+                //     $('#oldBookingsList').html('');
+                //     Object.entries(olderBookings).forEach(([name,ob]) => {
+                //         $('#oldBookingsList').append(new OlderBooking(ob,name));
+                //     })
+                //     $('#dialogPanel').panel('open');
+                // }
+                // else {
                     dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
                         this.container
                             .html(this.data.apartment);
@@ -688,7 +688,7 @@ class Booking extends HTMLElement {
                             console.log('booking created');
     
                     }, () => {console.log('an error occured');})
-                }
+                // }
             }
             else {
                 console.log("slot is taken");
