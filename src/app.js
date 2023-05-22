@@ -5,6 +5,7 @@ let weekSelector;
 let weekSchedule;
 let version = 1;
 let myBookings = {};
+let allBookings;
 
 // let AESencrypt = function(str, key) {
 //     return CryptoJS.AES.encrypt(str, key);
@@ -425,6 +426,9 @@ class WeekSchedule extends HTMLElement {
         }
 
         $.when(getBookings()).done(data => {
+            console.log('APARTMENT', localStorage.getItem('apartment'));
+            console.log('ALL BOOKINGS', data.map(d => d.identifier));
+            allBookings = data;
             data.forEach(d => {
                 let slotElement = this.weekGrid.children('#' + d.year + '_' + d.month + '_' + d.day + '_' + d.hour);
                 if (slotElement.length > 0) {
@@ -443,6 +447,134 @@ class WeekSchedule extends HTMLElement {
     }
 }
 window.customElements.define('week-schedule', WeekSchedule);
+
+class OlderBooking extends HTMLElement {
+    constructor(bookings, name) {
+        super();
+
+        this.bookings = bookings;
+        // this.bookingName = "slot_" +
+        // booking.apartment + "_" +
+        // booking.year + "_" +
+        // booking.month + "_" +
+        // booking.day + "_" +
+        // booking.hour + "_" +
+        // booking.identifier + "_" +
+        //     'lgh' + booking.apartment;
+
+        let template = document.createElement('template');
+        template.innerHTML = /*html*/`
+            <style>
+                #older-booking-container {
+                    background-color: lightgray;
+                    margin: 10px 0 0 0;
+                    padding: 5px;
+                }
+                .bookingname {
+                    font-weight: bold;
+                }
+                .cleantask {
+                    display: grid;
+                    height: 20px;
+                    grid-template-columns: auto 40px;
+                    margin: 5px 0 0 0;
+                    // background-color: darkgrey;
+                }
+                .raderapass {
+                    width: 100%;
+                    height: 20%;
+                    text-align: center;
+                    margin: 10px 0 0 0;
+                    background-color: darkred;
+                    color: white;
+                    border-radius: 5px;
+                }
+
+                input[type=checkbox]{
+                    height: 0;
+                    width: 0;
+                    visibility: hidden;
+                  }
+                  
+                  label {
+                    cursor: pointer;
+                    top: -20px;
+                    width: 40px;
+                    height: 20px;
+                    background: darkred;
+                    display: block;
+                    border-radius: 20px;
+                    position: relative;
+                  }
+                  
+                  label:after {
+                    content: '';
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    width: 16px;
+                    height: 16px;
+                    background: #fff;
+                    border-radius: 16px;
+                    transition: 0.3s;
+                  }
+                  
+                  input:checked + label {
+                    background: darkgreen;
+                  }
+                  
+                  input:checked + label:after {
+                    left: calc(100% - 2px);
+                    transform: translateX(-100%);
+                  }
+                  
+                  label:active:after {
+                    width: 15px;
+                  }
+
+            </style>
+            <div id="older-booking-container">
+                <div class=bookingname>pass: ${name}</div>
+                <div class="cleantasks">
+                    <div class=cleantask><div>sopat golvet</div><div><input type="checkbox" id="switch1" /><label for="switch1"></label></div></div>
+                    <div class=cleantask><div>våttorkat golvet</div><div><input type="checkbox" id="switch2" /><label for="switch2"></label></div></div>
+                    <div class=cleantask><div>våttorkat ytor</div><div><input type="checkbox" id="switch3" /><label for="switch3"></label></div></div>
+                </div>
+                <div class="raderapass">✖</button></div>
+            </div>
+        `;
+        this.appendChild(template.content.cloneNode(true));
+    }
+
+    connectedCallback() {
+
+        const cleantasks = $('.cleanAnswer');
+        // .html(bookingText)
+        // .addClass(bookingClass);
+
+        console.log(cleantasks);
+        
+        cleantasks.each((a,b) => {
+            console.log(a);
+            console.log(b);
+            $(b).on('click', event => {
+                console.log('TOGGELING', this.bookings);
+
+                // dropbox.filesDelete({path: "/" + this.bookingName})
+                // .then(() =>  {
+                //     console.log('booking deleted');
+                //     this.remove();
+                // }, () => {console.log('an error occured');})
+
+            });
+            
+        })
+
+
+    }
+}
+window.customElements.define('older-booking', OlderBooking);
+
 
 class Booking extends HTMLElement {
 
@@ -521,13 +653,47 @@ class Booking extends HTMLElement {
             console.log('found', data[0].matches);
             // console.log('found', data[1].matches);
             if (data[0].matches.length === 0) {
-                dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
-                    this.container
-                        .html(this.data.apartment);
 
-                    console.log('booking created');
+                // Object.entries(allBookings)
+                // .filter(([k,b]) => b.apartment === this.data.apartment)
+                // .forEach(([k,b]) => {
+                //     console.log(b);
+                    
+                // })
 
-                }, () => {console.log('an error occured');})
+                const rightNow = new Date();
+                rightNow.setHours(0);
+                rightNow.setMinutes(0);
+                rightNow.setSeconds(0);
+                rightNow.setMilliseconds(0);
+                const olderBookings = {};
+                Object.entries(allBookings).filter(([key, value]) => value.apartment === this.data.apartment).forEach(([key, value]) => {
+                    console.log(key, value.data);
+                    const bookingDate = new Date(value.year, value.month-1, value.day);
+                    // olderBookingExists = olderBookingExists || (bookingDate < rightNow);
+                    const olderBookingKey = `${value.year}_${value.month-1}_${value.day}`;
+                    if (bookingDate < rightNow) {
+                        if (!olderBookings.hasOwnProperty(olderBookingKey)) olderBookings[olderBookingKey] = [];
+                        olderBookings[olderBookingKey].push(value);
+                    }
+                })
+                if (Object.keys(olderBookings).length > 0) {
+                    this.remove();
+                    $('#oldBookingsList').html('');
+                    Object.entries(olderBookings).forEach(([name,ob]) => {
+                        $('#oldBookingsList').append(new OlderBooking(ob,name));
+                    })
+                    $('#dialogPanel').panel('open');
+                }
+                else {
+                    dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
+                        this.container
+                            .html(this.data.apartment);
+    
+                            console.log('booking created');
+    
+                    }, () => {console.log('an error occured');})
+                }
             }
             else {
                 console.log("slot is taken");
@@ -546,6 +712,10 @@ class Booking extends HTMLElement {
                 console.log('booking deleted');
                 $(this).remove();
                 delete myBookings[this.data.identifier];
+                if (Object.keys(myBookings).length === 0) {
+                    console.log('NO MORE BOOKINGS');
+                    $('#dialogPanel').panel('open');
+                }
                 console.log(myBookings);
             }, () => {console.log('an error occured');})
     }
