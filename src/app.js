@@ -471,14 +471,14 @@ class OlderBooking extends HTMLElement {
                     padding: 5px;
                 }
                 .bookingname {
+                    font-family: monospace;
                     font-weight: bold;
                 }
                 .cleantask {
                     display: grid;
-                    height: 20px;
                     grid-template-columns: auto 40px;
+                    height: 20px;
                     margin: 5px 0 0 0;
-                    // background-color: darkgrey;
                 }
                 .raderapass {
                     width: 100%;
@@ -502,7 +502,7 @@ class OlderBooking extends HTMLElement {
                     width: 40px;
                     height: 20px;
                     background: darkred;
-                    display: block;
+                    /* display: block; */
                     border-radius: 20px;
                     position: relative;
                   }
@@ -534,8 +534,10 @@ class OlderBooking extends HTMLElement {
 
             </style>
             <div id="older-booking-container">
-                <div class=bookingname>pass: ${name}</div>
-                <div class="cleantasks">
+            <div class=bookingname>pass: ... ${name}</div>
+            <div class=bookingname>före: ... lägenhet 123</div>
+            <div class=bookingname>efter: .. lägenhet 456</div>
+            <div class="cleantasks">
                     <div class=cleantask><div>sopat golvet</div><div><input type="checkbox" id="switch1" /><label for="switch1"></label></div></div>
                     <div class=cleantask><div>våttorkat golvet</div><div><input type="checkbox" id="switch2" /><label for="switch2"></label></div></div>
                     <div class=cleantask><div>våttorkat ytor</div><div><input type="checkbox" id="switch3" /><label for="switch3"></label></div></div>
@@ -654,13 +656,6 @@ class Booking extends HTMLElement {
             // console.log('found', data[1].matches);
             if (data[0].matches.length === 0) {
 
-                // Object.entries(allBookings)
-                // .filter(([k,b]) => b.apartment === this.data.apartment)
-                // .forEach(([k,b]) => {
-                //     console.log(b);
-                    
-                // })
-
                 const rightNow = new Date();
                 rightNow.setHours(0);
                 rightNow.setMinutes(0);
@@ -712,10 +707,10 @@ class Booking extends HTMLElement {
                 console.log('booking deleted');
                 $(this).remove();
                 delete myBookings[this.data.identifier];
-                if (Object.keys(myBookings).length === 0) {
-                    console.log('NO MORE BOOKINGS');
-                    $('#dialogPanel').panel('open');
-                }
+                // if (Object.keys(myBookings).length === 0) {
+                //     console.log('NO MORE BOOKINGS');
+                //     $('#dialogPanel').panel('open');
+                // }
                 console.log(myBookings);
             }, () => {console.log('an error occured');})
     }
