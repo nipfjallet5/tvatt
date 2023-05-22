@@ -6,11 +6,12 @@ module.exports = {
     mode: 'development',
     context: path.join(__dirname, 'src'),
     entry: {
-        app: path.join(__dirname, '/src/app.js')
+        app: path.join(__dirname, '/src/app.js'),
+        checkout: path.join(__dirname, '/src/checkout.js')
         // tvattlib: path.join(__dirname, '/src/tvattlib.js'),
     },
     output: {
-        filename: 'app.js',
+        filename: '[name].js',
         path: path.join(__dirname, '.'),
         // crossOriginLoading: 'anonymous',
         // library: 'tvattlib',
@@ -64,5 +65,10 @@ module.exports = {
             template: 'app.html',
             chunks: ['app']
         }),
+        new HtmlWebpackPlugin({
+            filename: 'checkout.html',
+            template: 'checkout.html',
+            chunks: ['checkout']
+        })
     ]
 };

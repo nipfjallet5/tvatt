@@ -21,5 +21,28 @@
     "321": "Malm",
     "332": "Gjedsted, Maki",
     "331": "Westberg"
+  },
+  "apartments_new": {
+    "102": {"name": "Markusson", "email": "jolundq@gmail.com"},
+    "101": {"name": "Jansson, Jansdotter", "email": "jolundq@gmail.com"},
+    "111": {"name": "Andersson", "email": "jolundq@gmail.com"},
+    "112": {"name": "Forsgren", "email": "jolundq@gmail.com"},
+    "121": {"name": "Palffy", "email": "jolundq@gmail.com"},
+    "122": {"name": "Lundquist", "email": "jolundq@gmail.com"},
+    "131": {"name": "Beling, Breedh", "email": "jolundq@gmail.com"},
+    "132": {"name": "Brandtler", "email": "jolundq@gmail.com"},
+    "201": {"name": "Hjelmberg, Kohlmeier", "email": "jolundq@gmail.com"},
+    "212": {"name": "Johansson, Westberg", "email": "jolundq@gmail.com"},
+    "211": {"name": "Hultén", "email": "jolundq@gmail.com"},
+    "222": {"name": "Albåge", "email": "jolundq@gmail.com"},
+    "221": {"name": "Westin, Steele", "email": "jolundq@gmail.com"},
+    "232": {"name": "Ödbrink", "email": "jolundq@gmail.com"},
+    "231": {"name": "Gustin", "email": "jolundq@gmail.com"},
+    "312": {"name": "Widing, Daag", "email": "jolundq@gmail.com"},
+    "311": {"name": "Rönnlund", "email": "jolundq@gmail.com"},
+    "322": {"name": "Söderström", "email": "jolundq@gmail.com"},
+    "321": {"name": "Malm", "email": "jolundq@gmail.com"},
+    "332": {"name": "Gjedsted, Maki", "email": "jolundq@gmail.com"},
+    "331": {"name": "Westberg", "email": "jolundq@gmail.com"}
   }
 }
