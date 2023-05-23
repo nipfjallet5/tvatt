@@ -21,6 +21,7 @@
     "dropbox": "^10.34.0",
     "googleapis": "^118.0.0",
     "node-fetch": "^3.3.1",
-    "nodemailer": "^6.9.2"
+    "nodemailer": "^6.9.2",
+    "uuid": "^9.0.0"
   }
 }

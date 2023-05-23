@@ -1,4 +1,4 @@
-'use strict';
+import { v4 as uuidv4 } from 'uuid';
 
 let dropbox;
 let weekSelector;
@@ -488,6 +488,7 @@ class OlderBooking extends HTMLElement {
         this.dateString = `${this.date.getDate()}/${this.date.getMonth()+1}`;
         this.nChecked = 0;
         this.onDeleteHandler = () => {};
+        this.uuid = uuidv4(); 
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -577,10 +578,13 @@ class OlderBooking extends HTMLElement {
             <div id="older-booking-container">
             <div class=bookingname>pass: ${this.dateString} (${this.daysAgo === 0 ? 'idag' : this.daysAgo + ' dagar sedan'})</div>
             <div class="cleantasks">
-                    <div class=cleantask><div style="height: 20px">sopat golvet</div><div style="height: 20px"><input type="checkbox" id="switch1" /><label for="switch1"></label></div></div>
-                    <div class=cleantask><div style="height: 20px">våttorkat golvet</div><div style="height: 20px"><input type="checkbox" id="switch2" /><label for="switch2"></label></div></div>
-                    <div class=cleantask><div style="height: 20px">våttorkat ytor</div><div style="height: 20px"><input type="checkbox" id="switch3" /><label for="switch3"></label></div></div>
-                    <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch4" /><label for="switch4"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">sopat golvet</div><div style="height: 20px"><input type="checkbox" id="switch1_${this.uuid}" /><label for="switch1_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">våttorkat golvet</div><div style="height: 20px"><input type="checkbox" id="switch2_${this.uuid}" /><label for="switch2_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">våttorkat ytor</div><div style="height: 20px"><input type="checkbox" id="switch3_${this.uuid}" /><label for="switch3_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">ludd torktumlare</div><div style="height: 20px"><input type="checkbox" id="switch4_${this.uuid}" /><label for="switch4_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">ludd torkskåp</div><div style="height: 20px"><input type="checkbox" id="switch5_${this.uuid}" /><label for="switch5_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">städade inte</div><div style="height: 20px"><input type="checkbox" id="switch6_${this.uuid}" /><label for="switch6_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch7_${this.uuid}" /><label for="switch7_${this.uuid}"></label></div></div>
                 </div>
                 <div class="raderapass">checka av</div>
                 <div id="older-booking-container-overlay">skickar ...<div>
@@ -619,6 +623,8 @@ class OlderBooking extends HTMLElement {
                 $('#popupMessage').popup('open');
                 return;
             }
+
+            // sendMail('hej');
 
             overlay.style.visibility = "visible";
 
