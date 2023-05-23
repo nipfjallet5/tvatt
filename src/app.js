@@ -489,6 +489,7 @@ class OlderBooking extends HTMLElement {
         this.nChecked = 0;
         this.onDeleteHandler = () => {};
         this.uuid = uuidv4(); 
+        this.cleanCode = 0;
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -583,8 +584,9 @@ class OlderBooking extends HTMLElement {
                     <div class=cleantask><div style="height: 20px">våttorkat ytor</div><div style="height: 20px"><input type="checkbox" id="switch3_${this.uuid}" /><label for="switch3_${this.uuid}"></label></div></div>
                     <div class=cleantask><div style="height: 20px">ludd torktumlare</div><div style="height: 20px"><input type="checkbox" id="switch4_${this.uuid}" /><label for="switch4_${this.uuid}"></label></div></div>
                     <div class=cleantask><div style="height: 20px">ludd torkskåp</div><div style="height: 20px"><input type="checkbox" id="switch5_${this.uuid}" /><label for="switch5_${this.uuid}"></label></div></div>
-                    <div class=cleantask><div style="height: 20px">städade inte</div><div style="height: 20px"><input type="checkbox" id="switch6_${this.uuid}" /><label for="switch6_${this.uuid}"></label></div></div>
-                    <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch7_${this.uuid}" /><label for="switch7_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">rengjort fack</div><div style="height: 20px"><input type="checkbox" id="switch6_${this.uuid}" /><label for="switch6_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">städade inte</div><div style="height: 20px"><input type="checkbox" id="switch7_${this.uuid}" /><label for="switch7_${this.uuid}"></label></div></div>
+                    <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch8_${this.uuid}" /><label for="switch8_${this.uuid}"></label></div></div>
                 </div>
                 <div class="raderapass">checka av</div>
                 <div id="older-booking-container-overlay">skickar ...<div>
@@ -608,11 +610,12 @@ class OlderBooking extends HTMLElement {
         
         cleantasks.forEach((element) => {
             $(element).on('change', event => {
-                console.log(event.target);
                 this.nChecked = [...cleantasks].filter(e => e.checked).length;
                 console.log('TOGGELING', this.nChecked);
                 deletebutton.style['background-color'] = this.nChecked > 0 ? 'darkgreen' : 'darkred';
                 // deletebutton.style['pointer-events'] = nChecked > 0 ? 'auto' : 'none';
+                this.cleanCode = [...cleantasks].map(element => element.checked).reduce((res, x) => res << 1 | x)
+                console.log(this.cleanCode);
             });
         })
 
@@ -637,7 +640,13 @@ class OlderBooking extends HTMLElement {
                 b.booking.hour + "_" +
                 b.booking.identifier + "_" +
                     'lgh' + b.booking.apartment;
-                console.log(bookingName);
+
+                const checkName = "check_" +
+                b.booking.apartment + "_" +
+                b.booking.year + "_" +
+                b.booking.month + "_" +
+                b.booking.day + "_" +
+                this.cleanCode;
 
                 dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
                 .then(() =>  {
@@ -646,6 +655,10 @@ class OlderBooking extends HTMLElement {
                     this.onDeleteHandler(this.key);
                     weekSchedule[0].reload();
                     overlay.style.visibility = "hidden";
+                    dropbox.filesUpload({path: "/" + checkName, contents: "content"})
+                        .then(() => {
+                        }, () => {console.log('an error occured');})
+
                 }, () => {console.log('an error occured');})
             })
         });
