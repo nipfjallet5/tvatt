@@ -1,3 +1,4 @@
+const glob = require('glob');
 let CryptoJS = require('crypto-js');
 let fs = require('fs');
 
@@ -47,20 +48,11 @@ let AESdecrypt = function(str, key) {
     return CryptoJS.AES.decrypt(str, key).toString(CryptoJS.enc.Utf8);
 };
 
-const fileName = process.argv.slice(2)[0];
-const key = process.argv.slice(2)[1];
-console.log(fileName, key);
+let password = CryptoJS.SHA256(process.argv[2]).toString();
 
-let password = CryptoJS.SHA256(key).toString();
-
-encryptFile(fileName, `../enc/${fileName}.enc`, password);
-
-
-// fs.readFile(fileName, (err, data) => {
-//     if (err) throw err;
-//     let crypto = CryptoJS.AES.encrypt(data.toString(), password).toString();
-//     return fs.writeFile(`../assets/enc/${fileName}.enc`, crypto, (err) => {
-//         if (err) throw err;
-//         console.log('Saved!');
-//     });
-// });
+glob(__dirname + '/**/*.json', {}, (err, files)=>{
+    files.forEach(f => {
+        const outFile = f.replace('.json', '.json.enc');
+        encryptFile(f, outFile, password);
+    })
+})
