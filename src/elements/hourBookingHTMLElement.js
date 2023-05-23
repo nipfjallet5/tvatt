@@ -113,4 +113,4 @@ export class HourBooking extends HTMLElement {
         // }
     }
 }
-window.customElements.define('hour-booking-new', HourBooking);
+window.customElements.define('hour-booking', HourBooking);

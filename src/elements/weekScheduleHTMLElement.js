@@ -8,6 +8,8 @@ export class WeekSchedule extends HTMLElement {
     constructor() {
         super();
 
+        this.readyHandler = () => {};
+
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
             <style>
@@ -183,7 +185,7 @@ export class WeekSchedule extends HTMLElement {
         // }
 
         $.when(this.getBookings()).done(data => {
-            this.allBookings = data;
+            // this.allBookings = data;
 
             const rightNow = new Date();
             rightNow.setHours(0);
@@ -233,6 +235,7 @@ export class WeekSchedule extends HTMLElement {
 
             console.log('SESSIONS', sessions);
 
+            this.readyHandler(sessions);
             setWeekTask.resolve();
         });
 
@@ -295,10 +298,14 @@ export class WeekSchedule extends HTMLElement {
     
         return fetchTask;
     };
-    
 
     reload() {
         this.setWeek(this.weekInfo);
     }
+
+    onReady(handler) {
+        this.readyHandler = handler;
+    }
+
 }
-window.customElements.define('week-schedule-new', WeekSchedule);
+window.customElements.define('week-schedule', WeekSchedule);

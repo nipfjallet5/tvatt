@@ -53,10 +53,6 @@ Date.prototype.isSameDay = function(date) {
         this.getDate() === date.getDate();
 };
 
-function isValidBooking(data) {
-    return true;
-}
-
 function hideKeyboard(element) {
     element.attr('readonly', 'readonly'); // Force keyboard to hide on input field.
     element.attr('disabled', 'true'); // Force keyboard to hide on textarea field.
@@ -102,6 +98,33 @@ function manageOldBookings(apartment, startDate, message) {
     return true;
 }
 
+function manageSessions(sessions) {
+
+    const myOldSessions = Object.values(sessions).filter(s => s.isMySession && s.isOldSession)
+    const myTodaySessions = Object.values(sessions).filter(s => s.isMySession && s.isTodaySession)
+    console.log(myOldSessions);
+    console.log(myTodaySessions);
+    
+    // $('#dialogPanel').panel('open');
+
+    // if (Object.keys(oldBookings).length > 0) {
+    //     $('#oldBookingsList').html('');
+    //     Object.entries(oldBookings).forEach(([key, ob]) => {
+    //         const olderBooking = new OlderBooking(ob, key);
+    //         olderBooking.onDelete((key) => {
+    //             delete oldBookings[key];
+    //             if (Object.keys(oldBookings).length === 0) $('#dialogPanel').panel('close');
+    //         })
+    //         $('#oldBookingsList').append(olderBooking);
+    //     })
+
+    //     if (message) $('#dialogPanelMessage').html(message);
+    //     $('#dialogPanel').panel('open');
+    //     return false;
+    // }
+    // return true;
+}
+
 let loadApp = function(){
 
     window.dropbox = new Dropbox.Dropbox({
@@ -136,6 +159,10 @@ let loadApp = function(){
                 weekSelector[0].enable(true);
         });
     });
+
+    weekSchedule[0].onReady(sessions => {
+        manageSessions(sessions);
+    })
 
     content.append(weekSelector);
     content.append(weekSchedule);
