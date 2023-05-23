@@ -4,7 +4,7 @@ let dropbox;
 let weekSelector;
 let weekSchedule;
 let version = 1;
-let myBookings = {};
+// let myBookings = {};
 let allBookings;
 
 // let AESencrypt = function(str, key) {
@@ -126,7 +126,7 @@ let getBookings = function() {
                     .reduce((res, db, i, array) => array.slice(1), [])
                     .forEach(db => {
                         console.log('deleting', db.path_lower);
-                        dropbox.filesDelete({path: db.path_lower}).then(() => {
+                        dropbox.filesDelete({path: db.path_lower}).then(() => { //delete when duplicates
                             console.log('duplicates deleted');
                             weekSchedule[0].reload();
                         });
@@ -257,11 +257,10 @@ class WeekSelector extends HTMLElement {
         $(this).trigger('setWeek', {weekNo: this.currentWeek, mondayDate: this.currentDate.getPreviousMonday()});
     }
 
-    reload() {
-        this.currentDate = new Date();
-        $(this).trigger('setWeek', {weekNo: this.currentWeek, mondayDate: this.currentDate.getPreviousMonday()});
-    }
-
+    // reload() {
+    //     this.currentDate = new Date();
+    //     $(this).trigger('setWeek', {weekNo: this.currentWeek, mondayDate: this.currentDate.getPreviousMonday()});
+    // }
 
     enable(value) {
         $('.weekSelectButton').prop("disabled", !value);
@@ -424,7 +423,7 @@ class WeekSchedule extends HTMLElement {
                         identifier: year + '' + month + '' + date + '' + hour
                     })
                     .click(function() {
-                        console.log(Object.keys(myBookings).length);
+                        // console.log(Object.keys(myBookings).length);
                         if ($(this).children().length === 0 && isValidBooking($(this).data())) {
                             $(this).append(new Booking($(this).data(), true));
                         }
@@ -461,6 +460,7 @@ class WeekSchedule extends HTMLElement {
             data.forEach(d => {
                 let slotElement = this.weekGrid.children('#' + d.year + '_' + d.month + '_' + d.day + '_' + d.hour);
                 if (slotElement.length > 0) {
+                    slotElement.html('');
                     // console.log(slotElement);
                     slotElement.append(new Booking(d, false));
                 }
@@ -478,10 +478,16 @@ class WeekSchedule extends HTMLElement {
 window.customElements.define('week-schedule', WeekSchedule);
 
 class OlderBooking extends HTMLElement {
-    constructor(bookings, name) {
+    constructor(bookings, key) {
         super();
 
+        this.key = key;
         this.bookings = bookings;
+        this.date = bookings[0].date;
+        this.daysAgo = Math.floor(((new Date()) - this.date)/1000/60/60/24);
+        this.dateString = `${this.date.getDate()}/${this.date.getMonth()+1}`;
+        this.nChecked = 0;
+        this.onDeleteHandler = () => {};
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -490,6 +496,19 @@ class OlderBooking extends HTMLElement {
                     background-color: lightgray;
                     margin: 10px 0 0 0;
                     padding: 5px;
+                    position: relative;
+                }
+                #older-booking-container-overlay {
+                    background-color: #55555599;
+                    color: white;
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    text-align: center;
+                    line-height: 100px;
+                    visibility: hidden;
                 }
                 .bookingname {
                     /* font-family: monospace; */
@@ -502,13 +521,14 @@ class OlderBooking extends HTMLElement {
                     margin: 5px 0 0 0;
                 }
                 .raderapass {
-                    width: 100%;
-                    height: 20%;
+                    width: 50%;
+                    height: 20px;
                     text-align: center;
                     margin: 10px 0 0 0;
                     background-color: darkred;
                     color: white;
                     border-radius: 5px;
+                    /* pointer-events: none; */
                 }
 
                 input[type=checkbox]{
@@ -517,7 +537,7 @@ class OlderBooking extends HTMLElement {
                     visibility: hidden;
                   }
                   
-                  label {
+                label {
                     cursor: pointer;
                     top: -20px;
                     width: 40px;
@@ -526,9 +546,9 @@ class OlderBooking extends HTMLElement {
                     /* display: block; */
                     border-radius: 20px;
                     position: relative;
-                  }
-                  
-                  label:after {
+                }
+                
+                label:after {
                     content: '';
                     position: absolute;
                     top: 2px;
@@ -538,31 +558,32 @@ class OlderBooking extends HTMLElement {
                     background: #fff;
                     border-radius: 16px;
                     transition: 0.3s;
-                  }
-                  
-                  input:checked + label {
+                }
+                
+                input:checked + label {
                     background: darkgreen;
-                  }
-                  
-                  input:checked + label:after {
+                }
+                
+                input:checked + label:after {
                     left: calc(100% - 2px);
                     transform: translateX(-100%);
-                  }
-                  
-                  label:active:after {
+                    }
+                
+                label:active:after {
                     width: 15px;
-                  }
+                }
 
             </style>
             <div id="older-booking-container">
-            <div class=bookingname>pass: ${name}</div>
+            <div class=bookingname>pass: ${this.dateString} (${this.daysAgo === 0 ? 'idag' : this.daysAgo + ' dagar sedan'})</div>
             <div class="cleantasks">
                     <div class=cleantask><div style="height: 20px">sopat golvet</div><div style="height: 20px"><input type="checkbox" id="switch1" /><label for="switch1"></label></div></div>
                     <div class=cleantask><div style="height: 20px">våttorkat golvet</div><div style="height: 20px"><input type="checkbox" id="switch2" /><label for="switch2"></label></div></div>
                     <div class=cleantask><div style="height: 20px">våttorkat ytor</div><div style="height: 20px"><input type="checkbox" id="switch3" /><label for="switch3"></label></div></div>
                     <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch4" /><label for="switch4"></label></div></div>
                 </div>
-                <div class="raderapass">✔</div>
+                <div class="raderapass">checka av</div>
+                <div id="older-booking-container-overlay">skickar ...<div>
             </div>
         `;
         this.appendChild(template.content.cloneNode(true));
@@ -573,75 +594,91 @@ class OlderBooking extends HTMLElement {
         // const cleantasks = $(this).children('.cleanAnswer');
         // const deletebuttons = $(this).children('.raderapass');
         const cleantasks = this.querySelectorAll('input[type=checkbox]');
-        const deletebuttons = this.querySelectorAll('.raderapass');
+        const deletebutton = this.querySelector('.raderapass');
+        const overlay = this.querySelector('#older-booking-container-overlay');
         // .html(bookingText)
         // .addClass(bookingClass);
 
         console.log(cleantasks);
-        console.log(deletebuttons);
+        console.log(deletebutton);
         
-        cleantasks.forEach((b) => {
-            console.log(b);
-            
-            $(b).on('change', event => {
-                console.log('TOGGELING', this.bookings);
+        cleantasks.forEach((element) => {
+            $(element).on('change', event => {
+                console.log(event.target);
+                this.nChecked = [...cleantasks].filter(e => e.checked).length;
+                console.log('TOGGELING', this.nChecked);
+                deletebutton.style['background-color'] = this.nChecked > 0 ? 'darkgreen' : 'darkred';
+                // deletebutton.style['pointer-events'] = nChecked > 0 ? 'auto' : 'none';
             });
         })
 
-        deletebuttons.forEach((b) => {
-            $(b).on('click', event => {
+        $(deletebutton).on('click', event => {
 
-                console.log('DELETING');
+            if (this.nChecked === 0) {
+                $('#popupMessageContent').html('Välj minst en städåtgärd. Eller "tvättade aldrig" om du inte använde passet.');
+                $('#popupMessage').popup('open');
+                return;
+            }
 
-                this.bookings.forEach(b => {
-                    const bookingName = "slot_" +
-                    b.apartment + "_" +
-                    b.year + "_" +
-                    b.month + "_" +
-                    b.day + "_" +
-                    b.hour + "_" +
-                    b.identifier + "_" +
-                        'lgh' + b.apartment;
-                    console.log(bookingName);
+            overlay.style.visibility = "visible";
 
-                    dropbox.filesDelete({path: "/" + bookingName})
-                    .then(() =>  {
-                        console.log('booking deleted');
-                        this.remove();
-                        weekSelector[0].reload();
-                    }, () => {console.log('an error occured');})
-                })
-            });
-        })
+            this.bookings.forEach(b => {
+                const bookingName = "slot_" +
+                b.booking.apartment + "_" +
+                b.booking.year + "_" +
+                b.booking.month + "_" +
+                b.booking.day + "_" +
+                b.booking.hour + "_" +
+                b.booking.identifier + "_" +
+                    'lgh' + b.booking.apartment;
+                console.log(bookingName);
+
+                dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
+                .then(() =>  {
+                    console.log('booking deleted');
+                    this.remove();
+                    this.onDeleteHandler(this.key);
+                    weekSchedule[0].reload();
+                    overlay.style.visibility = "hidden";
+                }, () => {console.log('an error occured');})
+            })
+        });
+    }
+
+    onDelete(handler) {
+        this.onDeleteHandler = handler;
     }
 }
 window.customElements.define('older-booking', OlderBooking);
 
-
-function manageOldBookings(apartment, startDate) {
+function manageOldBookings(apartment, startDate, message) {
     const rightNow = startDate;
-    console.log('DDDDDDDDDDDD00', rightNow);
     rightNow.setHours(0);
     rightNow.setMinutes(0);
     rightNow.setSeconds(0);
     rightNow.setMilliseconds(0);
-    console.log('DDDDDDDDDDDD11', rightNow);
     const oldBookings = {};
-    Object.entries(allBookings).filter(([key, value]) => value.apartment === apartment).forEach(([key, value]) => {
-        console.log(key, value.data);
-        const bookingDate = new Date(value.year, value.month-1, value.day);
-        const olderBookingKey = `${value.year}-${value.month-1<10?'0':''}${value.month-1}-${value.day-1<10?'0':''}${value.day}`;
-        console.log('DDDDDDDDDDDD22', bookingDate);
+    Object.entries(allBookings).filter(([key, value]) => value.apartment === apartment).forEach(([key, b]) => {
+        console.log(key, b.data);
+        const bookingDate = new Date(b.year, b.month-1, b.day);
+        const olderBookingKey = `${b.year}-${b.month<10?'0':''}${b.month}-${b.day-1<10?'0':''}${b.day}`;
         if (bookingDate < rightNow) {
             if (!oldBookings.hasOwnProperty(olderBookingKey)) oldBookings[olderBookingKey] = [];
-            oldBookings[olderBookingKey].push(value);
+            oldBookings[olderBookingKey].push({booking: b, date: bookingDate});
         }
     })
     if (Object.keys(oldBookings).length > 0) {
         $('#oldBookingsList').html('');
-        Object.entries(oldBookings).forEach(([name,ob]) => {
-            $('#oldBookingsList').append(new OlderBooking(ob,name));
+        Object.entries(oldBookings).forEach(([key, ob]) => {
+            const olderBooking = new OlderBooking(ob, key);
+            olderBooking.onDelete((key) => {
+                delete oldBookings[key];
+                if (Object.keys(oldBookings).length === 0) $('#dialogPanel').panel('close');
+            })
+            $('#oldBookingsList').append(olderBooking);
         })
+
+        if (message) $('#dialogPanelMessage').html(message);
         $('#dialogPanel').panel('open');
         return false;
     }
@@ -703,16 +740,16 @@ class Booking extends HTMLElement {
             if (this.data.apartment === localStorage.getItem('apartment') || localStorage.getItem('apartment') == 122) {
                 this.delete();
             }
-            else {
-                //TODO ...
-                // $('#popupBasic').popup('open');
-            }
+            // else {
+            //     // TODO ...
+            //     $('#popupBasic').popup('open');
+            // }
         });
 
-        if (this.data.apartment === localStorage.getItem('apartment')) {
-            myBookings[this.data.identifier] = this;
-            console.log(myBookings);
-        }
+        // if (this.data.apartment === localStorage.getItem('apartment')) {
+        //     myBookings[this.data.identifier] = this;
+        //     console.log(myBookings);
+        // }
 
         if (!this.doFetch) return;
 
@@ -748,35 +785,28 @@ class Booking extends HTMLElement {
     delete() {
 
         const todaysDate = new Date();
-        console.log('GGGGGG', Number.parseInt(this.data.year) === todaysDate.getFullYear());
-        console.log('GGGGGG', Number.parseInt(this.data.month)-1 === todaysDate.getMonth());
-        console.log('GGGGGG', Number.parseInt(this.data.day) === todaysDate.getDate());
-        
 
         if (Number.parseInt(this.data.year) === todaysDate.getFullYear() && Number.parseInt(this.data.month)-1 === todaysDate.getMonth() && Number.parseInt(this.data.day) === todaysDate.getDate()) {
-            console.log('FFFFFFFFFFFF', new Date(todaysDate.getTime() + 1000*60*60*24));
-            if (!manageOldBookings(localStorage.getItem('apartment'), new Date(todaysDate.getTime() + 2*1000*60*60*24))) return;
+            if (!manageOldBookings(localStorage.getItem('apartment'), new Date(todaysDate.getTime() + 2*1000*60*60*24), "Checka av dagens pass")) return;
         }
         
-        if (!manageOldBookings(localStorage.getItem('apartment'), todaysDate)){
-
+        if (!manageOldBookings(localStorage.getItem('apartment'), todaysDate)) {
         }
         else {
             this.container.html('...');
-            dropbox.filesDelete({path: "/" + this.bookingName})
-                .then(() =>  {
+            dropbox.filesDelete({path: "/" + this.bookingName}) //delete when canceling
+                .then((aaa) =>  {
                     console.log('booking deleted');
                     $(this).remove();
-                    delete myBookings[this.data.identifier];
+                    // delete myBookings[this.data.identifier];
                     // if (Object.keys(myBookings).length === 0) {
                     //     console.log('NO MORE BOOKINGS');
                     //     $('#dialogPanel').panel('open');
                     // }
-                    console.log(myBookings);
+                    // console.log(myBookings);
                 }, () => {console.log('an error occured');})
         }
     }
-
 }
 window.customElements.define('hour-booking', Booking);
 

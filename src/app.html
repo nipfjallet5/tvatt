@@ -3,6 +3,7 @@
 <head>
     <title>Tvättstugan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="600" >
     <!--<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">-->
     <!--<meta http-equiv="Pragma" content="no-cache">-->
     <!--<meta http-equiv="Expires" content="0">-->
@@ -95,6 +96,7 @@
 <body>
 
 <div id="appPage" data-role="page">
+
     <div data-role="panel" id="infoPanel" data-display="overlay">
         <h3>Tvättstugebokning för Nipfjället 5</h3>
 
@@ -108,19 +110,22 @@
         <!-- panel content goes here -->
     </div>
 
-    <div data-role="panel" id="checkoutPanel" data-display="overlay">
-        dialog
-    </div>
-
     <div data-role="panel" id="dialogPanel" data-display="overlay">
         <div style="padding: 10px">
-            Checka av gamla pass så att efterföljande kan se vilken städning som utförts.
+            <div id="dialogPanelMessage">Checka av gamla pass så att efterföljande kan se vilken städning som utförts.</div>
             <div id="oldBookingsList"></div>
         </div>
     </div>
 
+
+    <div data-role="popup" id="popupMessage">
+        <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+        <div id="popupMessageContent" style="padding:10px"></div>
+    </div>
+
+
     <div data-role="popup" id="popupBasic">
-        <!--<p>This is a completely basic popup, no options set.</p>-->
+        <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
         <div class="center-wrapper">
             <div>
                 <div class="label">Ange kod för att se namn.</div>

@@ -2,7 +2,9 @@ name: hello-world
 on: push
 jobs:
   my-job:
-    runs-on: ubuntu-latest
+    runs-on: node-latest
     steps:
-      - name: my-step
-        run: ls -al
+      - uses: actions/checkout@v3
+      - run: ls -al
+      - run: npm install
+      - run: node src\followup.mjs
