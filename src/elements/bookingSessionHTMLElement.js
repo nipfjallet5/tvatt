@@ -8,6 +8,7 @@ export class BookingSession extends HTMLElement {
         this.isMySession = false;
         this.isTodaySession = false;
         this.isOldSession = false;
+        this.followingSession = undefined;
         this.date = date;
         this.uuid = uuidv4(); 
         this.dateString = `${this.date.getDate()}/${this.date.getMonth()+1}`;
@@ -154,14 +155,15 @@ export class BookingSession extends HTMLElement {
             overlay.style.visibility = "visible";
 
             this.bookings.forEach(b => {
-                const bookingName = "slot_" +
-                b.booking.apartment + "_" +
-                b.booking.year + "_" +
-                b.booking.month + "_" +
-                b.booking.day + "_" +
-                b.booking.hour + "_" +
-                b.booking.identifier + "_" +
-                    'lgh' + b.booking.apartment;
+                b.delete();
+                // const bookingName = "slot_" +
+                // b.booking.apartment + "_" +
+                // b.booking.year + "_" +
+                // b.booking.month + "_" +
+                // b.booking.day + "_" +
+                // b.booking.hour + "_" +
+                // b.booking.identifier + "_" +
+                //     'lgh' + b.booking.apartment;
 
                 const checkName = "check_" +
                 b.booking.apartment + "_" +
@@ -170,20 +172,33 @@ export class BookingSession extends HTMLElement {
                 b.booking.day + "_" +
                 this.cleanCode;
 
-                window.dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
-                .then(() =>  {
-                    console.log('booking deleted');
-                    this.remove();
-                    this.onDeleteHandler(this.key);
-                    weekSchedule[0].reload();
-                    overlay.style.visibility = "hidden";
-                    window.dropbox.filesUpload({path: "/" + checkName, contents: "content"})
-                        .then(() => {
-                        }, () => {console.log('an error occured');})
+                // window.dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
+                // .then(() =>  {
+                //     console.log('booking deleted');
+                //     this.remove();
+                //     this.onDeleteHandler(this.key);
+                //     weekSchedule[0].reload();
+                //     overlay.style.visibility = "hidden";
+                //     window.dropbox.filesUpload({path: "/" + checkName, contents: "content"})
+                //         .then(() => {
+                //         }, () => {console.log('an error occured');})
 
-                }, () => {console.log('an error occured');})
+                // }, () => {console.log('an error occured');})
             })
         });
+    }
+
+    addBookingHour(bookingHour) {
+        this.bookings.push(bookingHour);
+        this.bookings.sort((a,b) => a.startTime - b.startTime)
+    }
+
+    getStartTime() {
+        return this.bookings[0].startTime;
+    }
+
+    getApartment() {
+        return this.bookings[0].data.apartment;
     }
 
     onDelete(handler) {

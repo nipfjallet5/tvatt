@@ -1,5 +1,10 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { v4: uuidv4 } = require('uuid');
+let fs = require('fs');
+
+const buldHash = uuidv4().split('-')[0];
+fs.writeFileSync('buildInfo.json', JSON.stringify({buildHash: buldHash}, null, 2));
 
 module.exports = {
     // mode: 'production',
@@ -11,7 +16,7 @@ module.exports = {
         // tvattlib: path.join(__dirname, '/src/tvattlib.js'),
     },
     output: {
-        filename: '[name].js',
+        filename: '[name].js?v=' + buldHash,
         path: path.join(__dirname, '.'),
         // crossOriginLoading: 'anonymous',
         // library: 'tvattlib',

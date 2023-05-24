@@ -1,3 +1,4 @@
+import buildInfo from '../buildInfo.json'
 import {OlderBooking} from './elements/olderBookingHTMLElement'
 import {WeekSchedule} from './elements/weekScheduleHTMLElement'
 import {WeekSelector} from './elements/weekSelectorHTMLElement'
@@ -104,6 +105,20 @@ function manageSessions(sessions) {
     const myTodaySessions = Object.values(sessions).filter(s => s.isMySession && s.isTodaySession)
     console.log(myOldSessions);
     console.log(myTodaySessions);
+
+    Object.values(sessions).forEach(s => {
+        console.log(s.getStartTime(), s.followingSession ? s.followingSession.getApartment() : '-');
+    })
+
+    // const sortedSessions = Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
+    // const allSessions = Object.values(sessions);
+    // allSessions.forEach(s => {
+    //     const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
+    //     if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
+    //     console.log(s.getStartTime(), sessionIndex, s.followingSession ? s.followingSession.getStartTime() : '-');
+    // })
+
+    // console.log(Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime()).map(s => s.getStartTime()));
     
     // $('#dialogPanel').panel('open');
 
@@ -168,6 +183,8 @@ let loadApp = function(){
     content.append(weekSchedule);
 
     weekSelector[0].setDate((new Date()))
+
+    $('#buildhash').html(`(${buildInfo.buildHash})`)
 
 };
 

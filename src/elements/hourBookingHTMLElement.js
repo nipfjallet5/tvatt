@@ -8,6 +8,7 @@ export class HourBooking extends HTMLElement {
         this.isTodayBooking = false;
         this.isOldBooking = false;
         this.doFetch = doFetch;
+        this.startTime = new Date(data.year, data.month+1, data.day, data.hour);
         this.bookingName = "slot_" +
             data.apartment + "_" +
             data.year + "_" +
@@ -95,12 +96,10 @@ export class HourBooking extends HTMLElement {
 
     delete() {
 
-        const todaysDate = new Date();
-
+        // const todaysDate = new Date();
         // if (Number.parseInt(this.data.year) === todaysDate.getFullYear() && Number.parseInt(this.data.month)-1 === todaysDate.getMonth() && Number.parseInt(this.data.day) === todaysDate.getDate()) {
         //     if (!manageOldBookings(localStorage.getItem('apartment'), new Date(todaysDate.getTime() + 2*1000*60*60*24), "Checka av dagens pass")) return;
         // }
-        
         // if (!manageOldBookings(localStorage.getItem('apartment'), todaysDate)) {
         // }
         // else {

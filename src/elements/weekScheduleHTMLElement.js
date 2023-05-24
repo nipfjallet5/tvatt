@@ -223,7 +223,7 @@ export class WeekSchedule extends HTMLElement {
                     bookingElement.isTodayBooking = bookingDate.getTime() === rightNow.getTime();
 
                     if (!sessions.hasOwnProperty(sessionKey)) sessions[sessionKey] = new BookingSession(bookingDate);
-                    sessions[sessionKey].bookings.push(bookingElement);
+                    sessions[sessionKey].addBookingHour(bookingElement);
                     sessions[sessionKey].isMySession = bookingElement.isMyBooking;
                     sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
                     sessions[sessionKey].isTodaySession = bookingElement.isTodayBooking;
@@ -232,6 +232,14 @@ export class WeekSchedule extends HTMLElement {
                     slotElement.append(bookingElement);
                 }
             });
+
+            const sortedSessions = Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
+            const allSessions = Object.values(sessions);
+            allSessions.forEach(s => {
+                const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
+                if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
+                // console.log(s.getStartTime(), sessionIndex, s.followingSession ? s.followingSession.getStartTime() : '-');
+            })
 
             console.log('SESSIONS', sessions);
 
