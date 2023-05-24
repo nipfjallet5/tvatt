@@ -18,6 +18,13 @@ let loadEnc = async function(password) {
     const apartmentInfo = dum[1];
 }
 
+let toUTC = function (date) {
+    // return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                date.getUTCDate(), date.getUTCHours(),
+                date.getUTCMinutes(), date.getUTCSeconds());
+
+}
 
 export class Booking {
 
@@ -28,6 +35,8 @@ export class Booking {
         this.isOldBooking = false;
         this.startTime = new Date(data.year, Number.parseInt(data.month)-1, data.day, data.hour);
         this.endTime = new Date(this.startTime.getTime() + 1000*60*60);
+        this.startTimeUTC = toUTC(this.startTime);
+        this.endTimeUTC = toUTC(this.endTime);
         this.name = "slot_" +
             data.apartment + "_" +
             data.year + "_" +
@@ -83,6 +92,14 @@ export class BookingSession {
 
     getEndTime() {
         return this.bookings[this.bookings.length - 1].endTime;
+    }
+
+    getStartTimeUTC() {
+        return new Date(this.bookings[0].startTimeUTC);
+    }
+
+    getEndTimeUTC() {
+        return new Date(this.bookings[this.bookings.length - 1].endTimeUTC);
     }
 }
 
@@ -140,9 +157,9 @@ async function getAllSessions(password) {
 
 export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
-    const ct = new Date();
-    // const ctUTC = new Date(Date.UTC(ct.getUTCFullYear(), ct.getUTCMonth(),ct.getUTCDate(), ct.getUTCHours(),ct.getUTCMinutes(), ct.getUTCSeconds()));
-    console.log(allSessions.map(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2)));
-    console.log(allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2) < 1));
-    return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2) < delay);
+    const ct = toUTC(new Date());
+    // allSessions.forEach(s => console.log(new Date(ct),s.getEndTimeUTC(), s.getEndTime()));
+    console.log(allSessions.map(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60)));
+    // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
+    return allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < delay);
 }
