@@ -90,37 +90,36 @@ dropbox.filesListFolder({path: ''})
 
     console.log(bookings);
     
+    sendMail(/*html*/`
 
-    // sendMail(/*html*/`
-
-    // <html>
-    // <head>
-    //     <style>
-    //     button {
-    //         width: 200px;
-    //     }
-    //     </style>
-    // </head>
-    // <body>
-    //     Hej!
+    <html>
+    <head>
+        <style>
+        button {
+            width: 200px;
+        }
+        </style>
+    </head>
+    <body>
+        Hej!
         
-    //     <p>Hoppas att tvättandet gick bra idag. </p>
+        <p>Hoppas att tvättandet gick bra idag. </p>
 
-    //     <p>
-    //     <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
-    //     </p>
+        <p>
+        <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
+        </p>
 
-    //     <p>
-    //     Tack för kvitteringen!
-    //     </p>
-    //     <p>
-    //     Mvh
-    //     Tvättappen
-    //     </p>
+        <p>
+        Tack för kvitteringen!
+        </p>
+        <p>
+        Mvh
+        Tvättappen
+        </p>
 
-    // </body>
-    // </html>
-    // `);
+    </body>
+    </html>
+    `);
     
 });
 
