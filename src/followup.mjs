@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import gapi from 'googleapis';
 import fs from 'fs';
 
-let password = CryptoJS.SHA256('7475').toString();
+let password = CryptoJS.SHA256(process.argv[2]).toString();
 
 async function sendMail(message) {
 
@@ -67,7 +67,6 @@ const dropbox = new db.Dropbox({
 const currentDate = new Date();
 console.log(currentDate.getDate());
 
-
 dropbox.filesListFolder({path: ''})
 .then(data => {
 
@@ -89,36 +88,39 @@ dropbox.filesListFolder({path: ''})
     .filter(booking => Number.parseInt(booking.month-1) == currentDate.getMonth())
     .filter(booking => Number.parseInt(booking.day) == currentDate.getDate())
 
-    sendMail(/*html*/`
+    console.log(bookings);
+    
 
-    <html>
-    <head>
-        <style>
-        button {
-            width: 200px;
-        }
-        </style>
-    </head>
-    <body>
-        Hej!
+    // sendMail(/*html*/`
+
+    // <html>
+    // <head>
+    //     <style>
+    //     button {
+    //         width: 200px;
+    //     }
+    //     </style>
+    // </head>
+    // <body>
+    //     Hej!
         
-        <p>Hoppas att tvättandet gick bra idag. </p>
+    //     <p>Hoppas att tvättandet gick bra idag. </p>
 
-        <p>
-        <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
-        </p>
+    //     <p>
+    //     <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
+    //     </p>
 
-        <p>
-        Tack för kvitteringen!
-        </p>
-        <p>
-        Mvh
-        Tvättappen
-        </p>
+    //     <p>
+    //     Tack för kvitteringen!
+    //     </p>
+    //     <p>
+    //     Mvh
+    //     Tvättappen
+    //     </p>
 
-    </body>
-    </html>
-    `);
+    // </body>
+    // </html>
+    // `);
     
 });
 
