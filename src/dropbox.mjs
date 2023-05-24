@@ -141,7 +141,8 @@ async function getAllSessions(password) {
 export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
     const ct = new Date();
-    console.log(allSessions.map(s => (s.getEndTime()-ct)/1000/60/60));
-    console.log(allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < 1));
-    return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < delay);
+    // const ctUTC = new Date(Date.UTC(ct.getUTCFullYear(), ct.getUTCMonth(),ct.getUTCDate(), ct.getUTCHours(),ct.getUTCMinutes(), ct.getUTCSeconds()));
+    console.log(allSessions.map(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2)));
+    console.log(allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2) < 1));
+    return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60-2) < delay);
 }
