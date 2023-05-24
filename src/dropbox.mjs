@@ -20,9 +20,9 @@ let loadEnc = async function(password) {
 
 let toUTC = function (date) {
     // return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
                 date.getUTCDate(), date.getUTCHours(),
-                date.getUTCMinutes(), date.getUTCSeconds());
+                date.getUTCMinutes(), date.getUTCSeconds()));
 
 }
 
@@ -158,8 +158,11 @@ async function getAllSessions(password) {
 export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
     const ct = toUTC(new Date());
-    // allSessions.forEach(s => console.log(new Date(ct),s.getEndTimeUTC(), s.getEndTime()));
+
+    allSessions.forEach(s => console.log(ct.getHours(),s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
+
     console.log(allSessions.map(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60)));
+
     // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
     return allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < delay);
 }
