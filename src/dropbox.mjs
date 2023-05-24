@@ -141,7 +141,7 @@ async function getAllSessions(password) {
 export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
     const ct = new Date();
-    // console.log(allSessions.map(s => (s.getEndTime()-ct)/1000/60/60));
-    // console.log(allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < 1));
+    console.log(allSessions.map(s => (s.getEndTime()-ct)/1000/60/60));
+    console.log(allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < 1));
     return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < delay);
 }
