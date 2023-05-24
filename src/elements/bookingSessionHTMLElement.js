@@ -13,6 +13,8 @@ export class BookingSession extends HTMLElement {
         this.uuid = uuidv4(); 
         this.dateString = `${this.date.getDate()}/${this.date.getMonth()+1}`;
         this.daysAgo = Math.floor(((new Date()) - this.date)/1000/60/60/24);
+        this.cleanCode = 0;
+        this.onDeleteHandler = () => {};
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -47,7 +49,8 @@ export class BookingSession extends HTMLElement {
                 }
                 .raderapass {
                     width: 50%;
-                    height: 20px;
+                    height: 25px;
+                    line-height: 25px;
                     text-align: center;
                     margin: 10px 0 0 0;
                     background-color: darkred;
@@ -111,7 +114,7 @@ export class BookingSession extends HTMLElement {
                     <div class=cleantask><div style="height: 20px">städade inte</div><div style="height: 20px"><input type="checkbox" id="switch7_${this.uuid}" /><label for="switch7_${this.uuid}"></label></div></div>
                     <div class=cleantask><div style="height: 20px">tvättade aldrig</div><div style="height: 20px"><input type="checkbox" id="switch8_${this.uuid}" /><label for="switch8_${this.uuid}"></label></div></div>
                 </div>
-                <div class="raderapass">checka av</div>
+                <div class="raderapass">skicka</div>
                 <div id="older-booking-container-overlay">skickar ...<div>
             </div>
         `;
@@ -121,70 +124,67 @@ export class BookingSession extends HTMLElement {
     connectedCallback() {
 
         // const cleantasks = $(this).children('.cleanAnswer');
-        // const deletebuttons = $(this).children('.raderapass');
+        // const sendbuttons = $(this).children('.raderapass');
         const cleantasks = this.querySelectorAll('input[type=checkbox]');
-        const deletebutton = this.querySelector('.raderapass');
+        const sendbutton = this.querySelector('.raderapass');
         const overlay = this.querySelector('#older-booking-container-overlay');
         // .html(bookingText)
         // .addClass(bookingClass);
 
-        console.log(cleantasks);
-        console.log(deletebutton);
-        
         cleantasks.forEach((element) => {
             $(element).on('change', event => {
                 this.nChecked = [...cleantasks].filter(e => e.checked).length;
                 console.log('TOGGELING', this.nChecked);
-                deletebutton.style['background-color'] = this.nChecked > 0 ? 'darkgreen' : 'darkred';
-                // deletebutton.style['pointer-events'] = nChecked > 0 ? 'auto' : 'none';
+                sendbutton.style['background-color'] = this.nChecked > 0 ? 'darkgreen' : 'darkred';
+                // sendbutton.style['pointer-events'] = nChecked > 0 ? 'auto' : 'none';
                 this.cleanCode = [...cleantasks].map(element => element.checked).reduce((res, x) => res << 1 | x)
                 console.log(this.cleanCode);
             });
         })
 
-        $(deletebutton).on('click', event => {
+        $(sendbutton).on('click', event => {
 
-            if (this.nChecked === 0) {
+            if (this.cleanCode === 0) {
                 $('#popupMessageContent').html('Välj minst en städåtgärd. Eller "tvättade aldrig" om du inte använde passet.');
                 $('#popupMessage').popup('open');
                 return;
             }
 
-            // sendMail('hej');
-
             overlay.style.visibility = "visible";
 
-            this.bookings.forEach(b => {
-                b.delete();
-                // const bookingName = "slot_" +
-                // b.booking.apartment + "_" +
-                // b.booking.year + "_" +
-                // b.booking.month + "_" +
-                // b.booking.day + "_" +
-                // b.booking.hour + "_" +
-                // b.booking.identifier + "_" +
-                //     'lgh' + b.booking.apartment;
-
-                const checkName = "check_" +
-                b.booking.apartment + "_" +
-                b.booking.year + "_" +
-                b.booking.month + "_" +
-                b.booking.day + "_" +
-                this.cleanCode;
-
-                // window.dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
-                // .then(() =>  {
-                //     console.log('booking deleted');
-                //     this.remove();
-                //     this.onDeleteHandler(this.key);
-                //     weekSchedule[0].reload();
-                //     overlay.style.visibility = "hidden";
-                //     window.dropbox.filesUpload({path: "/" + checkName, contents: "content"})
-                //         .then(() => {
-                //         }, () => {console.log('an error occured');})
-
-                // }, () => {console.log('an error occured');})
+            Promise.all(this.bookings.map(b => b.delete())).then(statuses => {
+                console.log(statuses);
+                this.remove();
+                this.onDeleteHandler(this);
+                overlay.style.visibility = "hidden";
             })
+
+            // this.bookings.forEach(b => {
+            //     // b.delete();
+
+            //     const checkName = "check_" +
+            //     b.data.apartment + "_" +
+            //     b.data.year + "_" +
+            //     b.data.month + "_" +
+            //     b.data.day + "_" +
+            //     this.cleanCode;
+
+            //     console.log('DELETING', checkName);
+                
+
+            //     // window.dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
+            //     // .then(() =>  {
+            //     //     console.log('booking deleted');
+            //     //     this.remove();
+            //     //     this.onDeleteHandler(this.key);
+            //     //     weekSchedule[0].reload();
+            //     //     overlay.style.visibility = "hidden";
+            //     //     window.dropbox.filesUpload({path: "/" + checkName, contents: "content"})
+            //     //         .then(() => {
+            //     //         }, () => {console.log('an error occured');})
+
+            //     // }, () => {console.log('an error occured');})
+            // })
         });
     }
 

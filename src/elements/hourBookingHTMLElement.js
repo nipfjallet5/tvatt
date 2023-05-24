@@ -8,7 +8,8 @@ export class HourBooking extends HTMLElement {
         this.isTodayBooking = false;
         this.isOldBooking = false;
         this.doFetch = doFetch;
-        this.startTime = new Date(data.year, data.month+1, data.day, data.hour);
+        this.startTime = new Date(data.year, Number.parseInt(data.month)-1, data.day, data.hour);
+        this.endTime = new Date(this.startTime.getTime() + 1000*60*60);
         this.bookingName = "slot_" +
             data.apartment + "_" +
             data.year + "_" +
@@ -18,11 +19,14 @@ export class HourBooking extends HTMLElement {
             data.identifier + "_" +
             'lgh' + data.apartment;
 
+        this.createHandler = () => {};
+        this.deleteHandler = () => {};
+
         let template = document.createElement('template');
         template.innerHTML = `
             <style>
                 #booking-container {
-                    line-height: 20px;
+                    line-height: 22px;
                     font-size: 14px;
                     width: 100%;
                     height: 100%;
@@ -52,15 +56,30 @@ export class HourBooking extends HTMLElement {
             .html(bookingText)
             .addClass(bookingClass);
 
-        this.container.on('click', event => {
+        this.container[0].addEventListener('click', event => {
             console.log('BOOKING CLICKED', this.data.apartment, localStorage.getItem('apartment'));
+
+            // const todaysDate = new Date();
+            // if (Number.parseInt(this.data.year) === todaysDate.getFullYear() && 
+            // Number.parseInt(this.data.month)-1 === todaysDate.getMonth() && 
+            // Number.parseInt(this.data.day) === todaysDate.getDate()) {
+            //     const currentTime = new Date();
+            //     if (currentTime > this.startTime) {
+            //         console.log('IS TODAY. NOT DELETING!');
+            //         this.deleteHandler('isTodaySession');
+            //         return false;
+            //     }
+            // }
+
+            if (window.haveOldSessions) {
+                console.log('HAVE OLD SESSIONS. NOT DELETING!');
+                this.deleteHandler('haveOldSessionsDelete');
+                return false;
+            }
+
             if (this.data.apartment === localStorage.getItem('apartment') || localStorage.getItem('apartment') == 122) {
                 this.delete();
             }
-            // else {
-            //     // TODO ...
-            //     $('#popupBasic').popup('open');
-            // }
         });
 
         if (!this.doFetch) return;
@@ -71,19 +90,25 @@ export class HourBooking extends HTMLElement {
         ];
 
         Promise.all(searchPromises).then(data => {
-            console.log('found', data[0].matches);
             if (data[0].matches.length === 0) {
-
-                // if (!manageOldBookings(this.data.apartment, new Date())) {
-                //     this.remove();
-                // }
-                // else {
-                    window.dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
-                        this.container
-                            .html(this.data.apartment);
-                            console.log('booking created');
+                const currentTime = new Date();
+                if (currentTime > this.startTime) {
+                    console.log('TOO EARLY. NOT DELETING!');
+                    this.createHandler('tooEarlyBooking');
+                    this.remove();
+                    return;
+                }
+                if (window.haveOldSessions) {
+                    console.log('HAVE OLD SESSIONS. NOT ADDING!');
+                    this.createHandler('haveOldSessions');
+                    this.remove();
+                    return;
+                }
+                window.dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
+                    this.container
+                        .html(this.data.apartment);
+                        this.createHandler('success');
                     }, () => {console.log('an error occured');})
-                // }
             }
             else {
                 console.log("slot is taken");
@@ -95,7 +120,6 @@ export class HourBooking extends HTMLElement {
     }
 
     delete() {
-
         // const todaysDate = new Date();
         // if (Number.parseInt(this.data.year) === todaysDate.getFullYear() && Number.parseInt(this.data.month)-1 === todaysDate.getMonth() && Number.parseInt(this.data.day) === todaysDate.getDate()) {
         //     if (!manageOldBookings(localStorage.getItem('apartment'), new Date(todaysDate.getTime() + 2*1000*60*60*24), "Checka av dagens pass")) return;
@@ -103,13 +127,26 @@ export class HourBooking extends HTMLElement {
         // if (!manageOldBookings(localStorage.getItem('apartment'), todaysDate)) {
         // }
         // else {
-            this.container.html('...');
+        return new Promise(resolve => {
+            if (this.container) this.container.html('...');
+            console.log('DELETING', this.bookingName);
             window.dropbox.filesDelete({path: "/" + this.bookingName}) //delete when canceling
-                .then((aaa) =>  {
-                    console.log('booking deleted');
+                .then((status) =>  {
                     $(this).remove();
+                    resolve(status);
+                    this.deleteHandler('success');
                 }, () => {console.log('an error occured');})
-        // }
+        })
+
+                // }
+    }
+
+    onCreate(handler) {
+        this.createHandler = handler;
+    }
+
+    onDelete(handler) {
+        this.deleteHandler = handler;
     }
 }
 window.customElements.define('hour-booking', HourBooking);

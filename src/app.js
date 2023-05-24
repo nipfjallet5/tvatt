@@ -3,6 +3,10 @@ import {OlderBooking} from './elements/olderBookingHTMLElement'
 import {WeekSchedule} from './elements/weekScheduleHTMLElement'
 import {WeekSelector} from './elements/weekSelectorHTMLElement'
 
+window.myOldSessions = [];
+window.myTodaySessions = [];
+window.haveOldSessions = false;
+
 // let dropbox;
 let weekSelector;
 let weekSchedule;
@@ -65,79 +69,41 @@ function hideKeyboard(element) {
     }, 100);
 }
 
-function manageOldBookings(apartment, startDate, message) {
-    const rightNow = startDate;
-    rightNow.setHours(0);
-    rightNow.setMinutes(0);
-    rightNow.setSeconds(0);
-    rightNow.setMilliseconds(0);
-    const oldBookings = {};
-    Object.entries(allBookings).filter(([key, value]) => value.apartment === apartment).forEach(([key, b]) => {
-        console.log(key, b.data);
-        const bookingDate = new Date(b.year, b.month-1, b.day);
-        const olderBookingKey = `${b.year}-${b.month<10?'0':''}${b.month}-${b.day-1<10?'0':''}${b.day}`;
-        if (bookingDate < rightNow) {
-            if (!oldBookings.hasOwnProperty(olderBookingKey)) oldBookings[olderBookingKey] = [];
-            oldBookings[olderBookingKey].push({booking: b, date: bookingDate});
-        }
-    })
-    if (Object.keys(oldBookings).length > 0) {
-        $('#oldBookingsList').html('');
-        Object.entries(oldBookings).forEach(([key, ob]) => {
-            const olderBooking = new OlderBooking(ob, key);
-            olderBooking.onDelete((key) => {
-                delete oldBookings[key];
-                if (Object.keys(oldBookings).length === 0) $('#dialogPanel').panel('close');
-            })
-            $('#oldBookingsList').append(olderBooking);
-        })
+function manageOldSessions(message, init) {
 
-        if (message) $('#dialogPanelMessage').html(message);
-        $('#dialogPanel').panel('open');
-        return false;
+    if (init) {
+        $('#oldBookingsList').html('');
+        if (window.myOldSessions.length > 0) {
+            window.haveOldSessions = true;
+            window.myOldSessions.forEach(mos => {
+                mos.onDelete((deletedSession) => {
+                    window.myOldSessions = window.myOldSessions.filter(mosInner => mosInner !== deletedSession);
+                    if (window.myOldSessions.length === 0) {
+                        window.haveOldSessions = false;
+                        $('#oldSessionsPanel').panel('close');
+                    }
+                })
+                $('#oldBookingsList').append(mos);
+            })
+            $('#oldSessionsPanelMessage').html(message);
+            $('#oldSessionsPanel').panel('open');
+        }
     }
-    return true;
+    else {
+        $('#oldSessionsPanelMessage').html(message);
+        $('#oldSessionsPanel').panel('open');
+    }
 }
 
-function manageSessions(sessions) {
-
-    const myOldSessions = Object.values(sessions).filter(s => s.isMySession && s.isOldSession)
-    const myTodaySessions = Object.values(sessions).filter(s => s.isMySession && s.isTodaySession)
-    console.log(myOldSessions);
-    console.log(myTodaySessions);
-
-    Object.values(sessions).forEach(s => {
-        console.log(s.getStartTime(), s.followingSession ? s.followingSession.getApartment() : '-');
+function manageTodaySessions(message) {
+    const tds = window.myTodaySessions[0];
+    $('#todaySessionPanelMessage').html(message);
+    $('#todayBookingsList').html('');
+    $('#todaySessionPanel').panel('open');
+    tds.onDelete((deletedSession) => {
+        $('#todaySessionPanel').panel('close');
     })
-
-    // const sortedSessions = Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
-    // const allSessions = Object.values(sessions);
-    // allSessions.forEach(s => {
-    //     const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
-    //     if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
-    //     console.log(s.getStartTime(), sessionIndex, s.followingSession ? s.followingSession.getStartTime() : '-');
-    // })
-
-    // console.log(Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime()).map(s => s.getStartTime()));
-    
-    // $('#dialogPanel').panel('open');
-
-    // if (Object.keys(oldBookings).length > 0) {
-    //     $('#oldBookingsList').html('');
-    //     Object.entries(oldBookings).forEach(([key, ob]) => {
-    //         const olderBooking = new OlderBooking(ob, key);
-    //         olderBooking.onDelete((key) => {
-    //             delete oldBookings[key];
-    //             if (Object.keys(oldBookings).length === 0) $('#dialogPanel').panel('close');
-    //         })
-    //         $('#oldBookingsList').append(olderBooking);
-    //     })
-
-    //     if (message) $('#dialogPanelMessage').html(message);
-    //     $('#dialogPanel').panel('open');
-    //     return false;
-    // }
-    // return true;
+    $('#todayBookingsList').append(tds);
 }
 
 let loadApp = function(){
@@ -176,7 +142,19 @@ let loadApp = function(){
     });
 
     weekSchedule[0].onReady(sessions => {
-        manageSessions(sessions);
+        manageOldSessions('Checka av gamla pass.', true);
+    })
+    
+    weekSchedule[0].onBookingClick((status, sessions) => {
+        if (status === 'haveOldSessions') {
+            manageOldSessions('Checka av gamla pass innan du bokar ett nytt.', false);
+        }
+        if (status === 'haveOldSessionsDelete') {
+            manageOldSessions('Checka av gamla pass innan du tar bort dem.', false);
+        }
+        if (status === 'isTodaySession') {
+            manageTodaySessions('Checka av pass');
+        }
     })
 
     content.append(weekSelector);

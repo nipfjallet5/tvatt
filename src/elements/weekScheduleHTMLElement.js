@@ -1,14 +1,14 @@
 import {HourBooking} from './hourBookingHTMLElement';
 import {BookingSession} from './bookingSessionHTMLElement';
 
-const sessions = {};
-
 export class WeekSchedule extends HTMLElement {
 
     constructor() {
         super();
 
+        this.sessions = {}
         this.readyHandler = () => {};
+        this.bookingClickHandler = () => {};
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -102,6 +102,8 @@ export class WeekSchedule extends HTMLElement {
 
     setWeek(weekInfo) {
 
+        const self = this;
+
         let setWeekTask = new $.Deferred();
 
         let currentDate = new Date();
@@ -158,7 +160,18 @@ export class WeekSchedule extends HTMLElement {
                     })
                     .click(function() {
                         if ($(this).children().length === 0) {
-                            $(this).append(new HourBooking($(this).data(), true));
+
+                            const bookingElement = new HourBooking($(this).data(), true);
+
+                            bookingElement.onCreate(status => {
+                                self.bookingClickHandler(status, this.sessions);
+                            });
+
+                            bookingElement.onDelete(status => {
+                                self.bookingClickHandler(status, this.sessions);
+                            });
+
+                            $(this).append(bookingElement);
                         }
                         // else {
                         //     let booking = $(this).children('hour-booking');
@@ -185,65 +198,64 @@ export class WeekSchedule extends HTMLElement {
         // }
 
         $.when(this.getBookings()).done(data => {
-            // this.allBookings = data;
 
-            const rightNow = new Date();
-            rightNow.setHours(0);
-            rightNow.setMinutes(0);
-            rightNow.setSeconds(0);
-            rightNow.setMilliseconds(0);
+            this.sessions = {}
 
-            // const myBookings = Object.values(data).filter(b => b.apartment === localStorage.getItem('apartment'));
-            // const myOldBookings = myBookings.filter(b => {
-            //     const bookingDate = new Date(b.year, b.month-1, b.day);
-            //     return bookingDate < rightNow;
-            // })
-            // const myTodayBookings = myBookings.filter(b => {
-            //     const bookingDate = new Date(b.year, b.month-1, b.day);
-            //     return bookingDate.getTime() === rightNow.getTime();
-            // })
-            // console.log('ALL BOOKINGS', data);
-            // console.log('MY BOOKINGS', myBookings);
-            // console.log('MY OLD BOOKINGS', myOldBookings);
-            // console.log('MY TODAY BOOKINGS', myTodayBookings);
-            
-            // manageOldBookings(localStorage.getItem('apartment'), new Date());
+            const currentTime = new Date();
+            const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
+            // ; todayDate.setHours(0); todayDate.setMinutes(0); todayDate.setSeconds(0); todayDate.setMilliseconds(0);
 
             data.forEach(b => {
 
+                const bookingDate = new Date(b.year, b.month-1, b.day);
+                const sessionKey = b.apartment + '_' + b.year + '_' + b.month + '_' + b.day;
+
+                const bookingElement = new HourBooking(b, false);
+
+                bookingElement.onCreate(status => {
+                    this.bookingClickHandler(status, this.sessions);
+                });
+
+                bookingElement.onDelete(status => {
+                    this.bookingClickHandler(status, this.sessions);
+                });
+
+                bookingElement.isMyBooking = b.apartment === localStorage.getItem('apartment');               
+                // bookingElement.isOldBooking = bookingDate < todayDate;
+                bookingElement.isOldBooking = bookingElement.endTime < currentTime;
+                bookingElement.isTodayBooking = bookingDate.getTime() === todayDate.getTime();
+
+                if (!this.sessions.hasOwnProperty(sessionKey)) this.sessions[sessionKey] = new BookingSession(bookingDate);
+                this.sessions[sessionKey].addBookingHour(bookingElement);
+                this.sessions[sessionKey].isMySession = bookingElement.isMyBooking;
+                this.sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
+                this.sessions[sessionKey].isTodaySession = bookingElement.isTodayBooking;
+
                 let slotElement = this.weekGrid.children('#' + b.year + '_' + b.month + '_' + b.day + '_' + b.hour);
+
                 if (slotElement.length > 0) {
-                    const bookingDate = new Date(b.year, b.month-1, b.day);
-                    const sessionKey = b.apartment + '_' + b.year + '_' + b.month + '_' + b.day;
-
-                    const bookingElement = new HourBooking(b, false);
-
-                    bookingElement.isMyBooking = b.apartment === localStorage.getItem('apartment');               
-                    bookingElement.isOldBooking = bookingDate < rightNow;
-                    bookingElement.isTodayBooking = bookingDate.getTime() === rightNow.getTime();
-
-                    if (!sessions.hasOwnProperty(sessionKey)) sessions[sessionKey] = new BookingSession(bookingDate);
-                    sessions[sessionKey].addBookingHour(bookingElement);
-                    sessions[sessionKey].isMySession = bookingElement.isMyBooking;
-                    sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
-                    sessions[sessionKey].isTodaySession = bookingElement.isTodayBooking;
 
                     slotElement.html('');
                     slotElement.append(bookingElement);
                 }
             });
 
-            const sortedSessions = Object.values(sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
-            const allSessions = Object.values(sessions);
+            const sortedSessions = Object.values(this.sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
+            const allSessions = Object.values(this.sessions);
             allSessions.forEach(s => {
                 const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
                 if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
                 // console.log(s.getStartTime(), sessionIndex, s.followingSession ? s.followingSession.getStartTime() : '-');
             })
 
-            console.log('SESSIONS', sessions);
+            window.myOldSessions = Object.values(this.sessions).filter(s => s.isMySession && s.isOldSession);
+            window.myTodaySessions = Object.values(this.sessions).filter(s => s.isMySession && s.isTodaySession);
 
-            this.readyHandler(sessions);
+            console.log('ALL SESSIONS', this.sessions);
+            console.log('MY OLD SESSIONS', window.myOldSessions);
+            console.log('MY TODAY SESSIONS', window.myTodaySessions);
+
+            this.readyHandler(this.sessions);
             setWeekTask.resolve();
         });
 
@@ -309,6 +321,10 @@ export class WeekSchedule extends HTMLElement {
 
     reload() {
         this.setWeek(this.weekInfo);
+    }
+
+    onBookingClick(handler) {
+        this.bookingClickHandler = handler;
     }
 
     onReady(handler) {
