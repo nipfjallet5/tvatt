@@ -19,10 +19,10 @@ let loadEnc = async function(password) {
 }
 
 let toUTC = function (date) {
-    // return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-                date.getUTCDate(), date.getUTCHours(),
-                date.getUTCMinutes(), date.getUTCSeconds()));
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    // return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                // date.getUTCDate(), date.getUTCHours(),
+                // date.getUTCMinutes(), date.getUTCSeconds()));
 
 }
 
