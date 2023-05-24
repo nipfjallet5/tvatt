@@ -1,9 +1,8 @@
-import db from 'dropbox';
 import CryptoJS from 'crypto-js';
-import fetch from 'node-fetch';
 import nodemailer from 'nodemailer';
 import gapi from 'googleapis';
 import fs from 'fs';
+import {getRecentlyFinishedSession} from './dropbox.mjs'
 
 let password = CryptoJS.SHA256(process.argv[2]).toString();
 
@@ -56,74 +55,43 @@ async function sendMail(message) {
     });
 }
 
-let accessToken = "U2FsdGVkX189p19Ob4DSM/9t8eIFgKOYYEKDM4ekNsC4VsMFP3pxSm7jPgao6UTwe89bkrrd2zgL+d0sISLA6jW7nc+7HUpUHw8YRxMeqPAsLGHpenmbNddMIYwNlB5N";
-const ddd = CryptoJS.AES.decrypt(accessToken, password).toString(CryptoJS.enc.Utf8);
-
-const dropbox = new db.Dropbox({
-    fetch: fetch,
-    accessToken: ddd
+getRecentlyFinishedSession(password, 1).then(sessions => {
+    if (sessions.length > 0) {
+        console.log(sessions);
+        console.log(sessions[0].getApartment());
+        sendMail(`Session for ${sessions[0].getApartment()} ended.`)
+    }
 });
 
-const currentDate = new Date();
-console.log(currentDate.getDate());
-
-dropbox.filesListFolder({path: ''})
-.then(data => {
-
-    let bookings = data.result.entries
-    .filter(booking => booking.name.startsWith("slot_"))
-    .map(booking => {
-        let bookingData = {
-            apartment: booking.name.split('_')[1],
-            year: booking.name.split('_')[2],
-            month: booking.name.split('_')[3],
-            day: booking.name.split('_')[4],
-            hour: booking.name.split('_')[5],
-            identifier: booking.name.split('_')[6]
-        };
-
-        return bookingData;
-    })
-    .filter(booking => Number.parseInt(booking.year) == currentDate.getFullYear())
-    .filter(booking => Number.parseInt(booking.month-1) == currentDate.getMonth())
-    .filter(booking => Number.parseInt(booking.day) == currentDate.getDate())
-
-    console.log(bookings);
     
-    sendMail(/*html*/`
-
-    <html>
-    <head>
-        <style>
-        button {
-            width: 200px;
-        }
-        </style>
-    </head>
-    <body>
-        Hej!
-        
-        <p>Hoppas att tvättandet gick bra idag. </p>
-
-        <p>
-        <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
-        </p>
-
-        <p>
-        Tack för kvitteringen!
-        </p>
-        <p>
-        Mvh
-        Tvättappen
-        </p>
-
-    </body>
-    </html>
-    `);
+// sendMail(/*html*/`
+// <html>
+// <head>
+//     <style>
+//     button {
+//         width: 200px;
+//     }
+//     </style>
+// </head>
+// <body>
+//     Hej!
     
-});
+//     <p>Hoppas att tvättandet gick bra idag. </p>
 
+//     <p>
+//     <a href="http://localhost:5000/checkout.html?p=12320230522">Kryssa i</a> den städning du utfört efter passet.
+//     </p>
 
-// 
-// console.log(dropbox);
+//     <p>
+//     Tack för kvitteringen!
+//     </p>
+//     <p>
+//     Mvh
+//     Tvättappen
+//     </p>
+
+// </body>
+// </html>
+// `);
+
 
