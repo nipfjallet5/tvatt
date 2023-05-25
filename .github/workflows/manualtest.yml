@@ -17,6 +17,9 @@ jobs:
   comment:
     runs-on: ubuntu-latest
     steps:
-      - run: gh workflow list 
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: test gh
+        run: gh workflow list 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
