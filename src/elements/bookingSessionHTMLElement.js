@@ -152,10 +152,21 @@ export class BookingSession extends HTMLElement {
 
             overlay.style.visibility = "visible";
 
+            const checkName = "check_" +
+            this.getApartment() + "_" +
+            this.followingSession.getApartment() + "_" +
+            this.bookings[0].data.year + "_" +
+            this.bookings[0].data.month + "_" +
+            this.bookings[0].data.day + "_" +
+            this.cleanCode;
+
             Promise.all(this.bookings.map(b => b.delete())).then(statuses => {
                 console.log(statuses);
                 this.remove();
                 this.onDeleteHandler(this);
+                window.dropbox.filesUpload({path: "/checks/" + checkName, contents: "content"})
+                    .then(() => {
+                    }, () => {console.log('an error occured');})
                 overlay.style.visibility = "hidden";
             })
 

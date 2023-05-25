@@ -162,7 +162,7 @@ let loadApp = function(){
 
     weekSelector[0].setDate((new Date()))
 
-    $('#buildhash').html(`(${buildInfo.buildHash})`)
+    $('#buildhash').html(`build: ${buildInfo.buildHash}`)
 
 };
 

@@ -92,18 +92,21 @@ export class HourBooking extends HTMLElement {
         Promise.all(searchPromises).then(data => {
             if (data[0].matches.length === 0) {
                 const currentTime = new Date();
-                if (currentTime > this.startTime) {
-                    console.log('TOO EARLY. NOT DELETING!');
-                    this.createHandler('tooEarlyBooking');
-                    this.remove();
-                    return;
-                }
+
+                // if (currentTime > this.startTime) {
+                //     console.log('TOO EARLY. NOT DELETING!');
+                //     this.createHandler('tooEarlyBooking');
+                //     this.remove();
+                //     return;
+                // }
+
                 if (window.haveOldSessions) {
                     console.log('HAVE OLD SESSIONS. NOT ADDING!');
                     this.createHandler('haveOldSessions');
                     this.remove();
                     return;
                 }
+
                 window.dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
                     this.container
                         .html(this.data.apartment);

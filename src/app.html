@@ -89,7 +89,12 @@
             top: 10px !important;
             border: none !important;
         }
-
+        #buildhash {
+            position: absolute;
+            font-size: 10px;
+            bottom: 2px;
+            left: 2px;
+        }
     </style>
 
 </head>
@@ -98,7 +103,7 @@
 <div id="appPage" data-role="page">
 
     <div data-role="panel" id="infoPanel" data-display="overlay">
-        <h3>Tvättstugebokning för Nipfjället 5 <span id="buildhash"></span></h3>
+        <h3>Tvättstugebokning för Nipfjället 5</h3>
 
         <ul>
             <li>Ett tvättpass får bestå av max 4 timmar</li>
@@ -107,7 +112,7 @@
             <li>Boka genom att klicka på en tom tid</li>
             <li>Avboka genom att klicka på en grön bokad tid</li>
         </ul>
-        <!-- panel content goes here -->
+        <div id="buildhash"></div>
     </div>
 
     <div data-role="panel" id="oldSessionsPanel" data-display="overlay">

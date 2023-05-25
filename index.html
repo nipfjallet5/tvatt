@@ -89,16 +89,21 @@
             top: 10px !important;
             border: none !important;
         }
-
+        #buildhash {
+            position: absolute;
+            font-size: 10px;
+            bottom: 2px;
+            left: 2px;
+        }
     </style>
 
-<script defer src="app.js?v=e465088e"></script></head>
+<script defer src="app.js?v=cda4b1fa"></script></head>
 <body>
 
 <div id="appPage" data-role="page">
 
     <div data-role="panel" id="infoPanel" data-display="overlay">
-        <h3>Tvättstugebokning för Nipfjället 5 <span id="buildhash"></span></h3>
+        <h3>Tvättstugebokning för Nipfjället 5</h3>
 
         <ul>
             <li>Ett tvättpass får bestå av max 4 timmar</li>
@@ -107,16 +112,22 @@
             <li>Boka genom att klicka på en tom tid</li>
             <li>Avboka genom att klicka på en grön bokad tid</li>
         </ul>
-        <!-- panel content goes here -->
+        <div id="buildhash"></div>
     </div>
 
-    <div data-role="panel" id="dialogPanel" data-display="overlay">
+    <div data-role="panel" id="oldSessionsPanel" data-display="overlay">
         <div style="padding: 10px">
-            <div id="dialogPanelMessage">Checka av gamla pass.</div>
+            <div id="oldSessionsPanelMessage"></div>
             <div id="oldBookingsList"></div>
         </div>
     </div>
 
+    <div data-role="panel" id="todaySessionPanel" data-display="overlay">
+        <div style="padding: 10px">
+            <div id="todaySessionPanelMessage"></div>
+            <div id="todayBookingsList"></div>
+        </div>
+    </div>
 
     <div data-role="popup" id="popupMessage">
         <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
