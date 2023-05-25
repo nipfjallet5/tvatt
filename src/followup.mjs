@@ -59,7 +59,7 @@ getRecentlyFinishedSession(password, 1).then(sessions => {
     if (sessions.length > 0) {
         console.log(sessions);
         console.log(sessions[0].getApartment());
-        sendMail(`Session for ${sessions[0].getApartment()} ended.`)
+        // sendMail(`Session for ${sessions[0].getApartment()} ended.`)
     }
 });
 

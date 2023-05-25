@@ -2,6 +2,8 @@ import db from 'dropbox';
 import CryptoJS from 'crypto-js';
 import fetch from 'node-fetch';
 import fs from 'fs';
+import printf from 'printf';
+import dateformat from 'dateformat';
 
 function toUTC(date) {
     return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
@@ -165,10 +167,23 @@ export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
     const ct = toSE(new Date());
 
-    allSessions.forEach(s => console.log(ct.getHours(), s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
+    // allSessions.forEach(s => console.log(ct.getHours(), s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
 
-    console.log(allSessions.map(s => (Math.abs(s.getEndTime()-ct)/1000/60/60)));
+    allSessions.sort((a,b) => a.getStartTime() - b.getStartTime()).forEach(s => {
+        const hoursAfterEndTime = (s.getEndTime()-ct)/1000/60/60;
+        console.log(printf('%-10s %-3i %s - %s %10.1f %s', 
+            s.getApartment(), 
+            s.bookings.length, 
+            dateformat(ct, "HH.MM"), 
+            dateformat(s.getEndTime(), "HH.MM mm-dd"), 
+            hoursAfterEndTime, 
+            hoursAfterEndTime > 0 && hoursAfterEndTime < delay
+            ));
+    })
 
     // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
-    return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < delay);
+    return allSessions.filter(s => {
+        const hoursAfterEndTime = (s.getEndTime()-ct)/1000/60/60;
+        return hoursAfterEndTime > 0 && hoursAfterEndTime < delay;
+    });
 }
