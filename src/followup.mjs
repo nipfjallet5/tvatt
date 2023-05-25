@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 import nodemailer from 'nodemailer';
 import gapi from 'googleapis';
 import fs from 'fs';
-import {getRecentlyFinishedSession} from './dropbox.mjs'
+import {getRecentlyFinishedSession} from './dropbox.mjs';
 
 let password = CryptoJS.SHA256(process.argv[2]).toString();
 
