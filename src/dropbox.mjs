@@ -183,7 +183,7 @@ export async function getRecentlyFinishedSession(password, delay) {
 
     // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
     return allSessions.filter(s => {
-        const hoursAfterEndTime = (s.getEndTime()-ct)/1000/60/60;
+        const hoursAfterEndTime = (ct - s.getEndTime())/1000/60/60;
         return hoursAfterEndTime > 0 && hoursAfterEndTime < delay;
     });
 }
