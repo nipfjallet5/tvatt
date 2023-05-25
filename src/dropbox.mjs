@@ -3,8 +3,21 @@ import CryptoJS from 'crypto-js';
 import fetch from 'node-fetch';
 import fs from 'fs';
 
+function toUTC(date) {
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    // return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                // date.getUTCDate(), date.getUTCHours(),
+                // date.getUTCMinutes(), date.getUTCSeconds()));
 
-let fetchEnc = function(name, password, key){
+}
+
+function toSE(date) {
+      return new Date(date.toLocaleString('en-US', {timeZone: 'Europe/Stockholm'}))
+    //   return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: 'Europe/Stockholm'}));   
+}
+
+
+function fetchEnc(name, password, key){
     return new Promise(resolve => {
         const encData = fs.readFile(`assets/enc/${name}.json.enc`, 'utf8', (err, encData) => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
@@ -12,19 +25,12 @@ let fetchEnc = function(name, password, key){
     })
 }
 
-let loadEnc = async function(password) {
+async function loadEnc(password) {
     const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
     const dbToken = dum[0].token;
     const apartmentInfo = dum[1];
 }
 
-let toUTC = function (date) {
-    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    // return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-                // date.getUTCDate(), date.getUTCHours(),
-                // date.getUTCMinutes(), date.getUTCSeconds()));
-
-}
 
 export class Booking {
 
@@ -157,12 +163,12 @@ async function getAllSessions(password) {
 
 export async function getRecentlyFinishedSession(password, delay) {
     const allSessions = await getAllSessions(password)
-    const ct = toUTC(new Date());
+    const ct = toSE(new Date());
 
-    allSessions.forEach(s => console.log(ct.getHours(),s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
+    allSessions.forEach(s => console.log(ct.getHours(), s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
 
-    console.log(allSessions.map(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60)));
+    console.log(allSessions.map(s => (Math.abs(s.getEndTime()-ct)/1000/60/60)));
 
     // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
-    return allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < delay);
+    return allSessions.filter(s => (Math.abs(s.getEndTime()-ct)/1000/60/60) < delay);
 }
