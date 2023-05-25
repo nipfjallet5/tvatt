@@ -170,7 +170,7 @@ export async function getRecentlyFinishedSession(password, delay) {
     // allSessions.forEach(s => console.log(ct.getHours(), s.getEndTimeUTC().getHours(), s.getEndTime().getHours()));
 
     allSessions.sort((a,b) => a.getStartTime() - b.getStartTime()).forEach(s => {
-        const hoursAfterEndTime = (s.getEndTime()-ct)/1000/60/60;
+        const hoursAfterEndTime = (ct - s.getEndTime())/1000/60/60;
         console.log(printf('%-10s %-3i %s - %s %10.1f %s', 
             s.getApartment(), 
             s.bookings.length, 
