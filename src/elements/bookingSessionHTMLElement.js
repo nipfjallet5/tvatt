@@ -208,6 +208,10 @@ export class BookingSession extends HTMLElement {
         return this.bookings[0].startTime;
     }
 
+    getEndTime() {
+        return this.bookings[this.bookings.length - 1].endTime;
+    }
+
     getApartment() {
         return this.bookings[0].data.apartment;
     }

@@ -59,22 +59,20 @@ export class HourBooking extends HTMLElement {
         this.container[0].addEventListener('click', event => {
             console.log('BOOKING CLICKED', this.data.apartment, localStorage.getItem('apartment'));
 
-            // const todaysDate = new Date();
-            // if (Number.parseInt(this.data.year) === todaysDate.getFullYear() && 
-            // Number.parseInt(this.data.month)-1 === todaysDate.getMonth() && 
-            // Number.parseInt(this.data.day) === todaysDate.getDate()) {
-            //     const currentTime = new Date();
-            //     if (currentTime > this.startTime) {
-            //         console.log('IS TODAY. NOT DELETING!');
-            //         this.deleteHandler('isTodaySession');
-            //         return false;
-            //     }
-            // }
-
             if (window.haveOldSessions) {
                 console.log('HAVE OLD SESSIONS. NOT DELETING!');
                 this.deleteHandler('haveOldSessionsDelete');
                 return false;
+            }
+
+            if (window.activeSession) {
+                console.log(window.activeSession.bookings.indexOf(this));
+                if (window.activeSession.getApartment() === localStorage.getItem('apartment') && window.activeSession.bookings.indexOf(this) >= 0) {
+                    
+                    console.log('SESSION ACTIVE. NOT DELETING!', window.activeSession.getApartment(), localStorage.getItem('apartment'));
+                    this.deleteHandler('sessionActive');
+                    return false;
+                }
             }
 
             if (this.data.apartment === localStorage.getItem('apartment') || localStorage.getItem('apartment') == 122) {
@@ -94,7 +92,7 @@ export class HourBooking extends HTMLElement {
                 const currentTime = new Date();
 
                 if (currentTime > this.startTime) {
-                    console.log('TOO EARLY. NOT DELETING!');
+                    console.log('TOO EARLY. NOT ADDING!');
                     this.createHandler('tooEarlyBooking');
                     this.remove();
                     return;

@@ -106,6 +106,17 @@ function manageTodaySessions(message) {
     $('#todayBookingsList').append(tds);
 }
 
+function manageActiveSessions(message) {
+    const as = window.activeSession;
+    $('#todaySessionPanelMessage').html(message);
+    $('#todayBookingsList').html('');
+    $('#todaySessionPanel').panel('open');
+    as.onDelete((deletedSession) => {
+        $('#todaySessionPanel').panel('close');
+    })
+    $('#todayBookingsList').append(as);
+}
+
 let loadApp = function(){
 
     window.dropbox = new Dropbox.Dropbox({
@@ -151,6 +162,9 @@ let loadApp = function(){
         }
         if (status === 'haveOldSessionsDelete') {
             manageOldSessions('Checka av gamla pass innan du tar bort dem.', false);
+        }
+        if (status === 'sessionActive') {
+            manageActiveSessions('Checka av pågående pass. Om du inte använde tiden välj "tvättade aldrig"', false);
         }
         if (status === 'isTodaySession') {
             manageTodaySessions('Checka av pass');

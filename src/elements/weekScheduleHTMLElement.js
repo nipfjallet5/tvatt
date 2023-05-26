@@ -245,8 +245,10 @@ export class WeekSchedule extends HTMLElement {
             allSessions.forEach(s => {
                 const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
                 if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
-                // console.log(s.getStartTime(), sessionIndex, s.followingSession ? s.followingSession.getStartTime() : '-');
+                if (s.getStartTime() < currentTime && s.getEndTime() > currentTime) window.activeSession = s;
+                console.log(sessionIndex, s.getApartment());
             })
+            
 
             window.myOldSessions = Object.values(this.sessions).filter(s => s.isMySession && s.isOldSession);
             window.myTodaySessions = Object.values(this.sessions).filter(s => s.isMySession && s.isTodaySession);
@@ -254,6 +256,7 @@ export class WeekSchedule extends HTMLElement {
             console.log('ALL SESSIONS', this.sessions);
             console.log('MY OLD SESSIONS', window.myOldSessions);
             console.log('MY TODAY SESSIONS', window.myTodaySessions);
+            console.log('ACTIVE SESSION', window.activeSession);
 
             this.readyHandler(this.sessions);
             setWeekTask.resolve();
