@@ -19,19 +19,19 @@ function toSE(date) {
 }
 
 
-function fetchEnc(name, password, key){
+export function fetchEnc(name, password){
     return new Promise(resolve => {
-        const encData = fs.readFile(`assets/enc/${name}.json.enc`, 'utf8', (err, encData) => {
+        fs.readFile(`assets/enc/${name}.json.enc`, 'utf8', (err, encData) => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
-    })
+        })
     })
 }
 
-async function loadEnc(password) {
-    const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
-    const dbToken = dum[0].token;
-    const apartmentInfo = dum[1];
-}
+// async function loadEnc(password) {
+//     const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
+//     const dbToken = dum[0].token;
+//     const apartmentInfo = dum[1];
+// }
 
 
 export class Booking {
@@ -182,8 +182,10 @@ export async function getRecentlyFinishedSession(password, delay) {
     })
 
     // console.log(allSessions.filter(s => (Math.abs(s.getEndTimeUTC()-ct)/1000/60/60) < 1));
-    return allSessions.filter(s => {
-        const hoursAfterEndTime = (ct - s.getEndTime())/1000/60/60;
-        return hoursAfterEndTime > 0 && hoursAfterEndTime < delay;
-    });
+    // return allSessions.filter(s => {
+    //     const hoursAfterEndTime = (ct - s.getEndTime())/1000/60/60;
+    //     return hoursAfterEndTime > 0 && hoursAfterEndTime < delay;
+    // });
+    return [allSessions[1]];
+
 }

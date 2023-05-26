@@ -91,12 +91,12 @@ export class HourBooking extends HTMLElement {
             if (data[0].matches.length === 0) {
                 const currentTime = new Date();
 
-                if (currentTime > this.startTime) {
-                    console.log('TOO EARLY. NOT ADDING!');
-                    this.createHandler('tooEarlyBooking');
-                    this.remove();
-                    return;
-                }
+                // if (currentTime > this.startTime) {
+                //     console.log('TOO EARLY. NOT ADDING!');
+                //     this.createHandler('tooEarlyBooking');
+                //     this.remove();
+                //     return;
+                // }
 
                 if (window.haveOldSessions) {
                     console.log('HAVE OLD SESSIONS. NOT ADDING!');

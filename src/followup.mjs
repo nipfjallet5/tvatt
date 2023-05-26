@@ -1,12 +1,13 @@
 import CryptoJS from 'crypto-js';
 import nodemailer from 'nodemailer';
+import dateformat from 'dateformat';
 import gapi from 'googleapis';
 import fs from 'fs';
-import {getRecentlyFinishedSession} from './dropbox.mjs';
+import {getRecentlyFinishedSession, fetchEnc} from './dropbox.mjs';
 
 let password = CryptoJS.SHA256(process.argv[2]).toString();
 
-async function sendMail(message) {
+async function sendMail(messageHtml, messageText, address) {
 
     const gauth = JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync('assets/enc/gauth.json.enc').toString(), password).toString(CryptoJS.enc.Utf8));
 
@@ -38,11 +39,12 @@ async function sendMail(message) {
     });
 
     const mailOptions = {
-        from: 'nipfjalet5@gmail.com',
-        to: 'jolundq@gmail.com',
-        subject: 'tvättpass',
-        text: 'text version',
-        html: message
+        from: 'nipfjallet5@gmail.com',
+        to: address,
+        bcc: 'nipfjallet5@gmail.com',
+        subject: 'ditt tvättpass',
+        text: messageText,
+        html: messageHtml
     };
 
     console.log(mailOptions);
@@ -55,11 +57,38 @@ async function sendMail(message) {
     });
 }
 
-getRecentlyFinishedSession(password, 1).then(sessions => {
+// (async () => {
+//     const data = (await fetchEnc('data', password));
+//     const apartment = '121';
+//     sendMail(`Session for ${apartment} (${data.apartments_new[apartment].email}) ended.`)
+// })()
+
+getRecentlyFinishedSession(password, 1).then(async sessions => {
+    const data = (await fetchEnc('data', password));
     if (sessions.length > 0) {
         console.log(sessions);
         console.log(sessions[0].getApartment());
-        sendMail(`Session for ${sessions[0].getApartment()} ended.`)
+
+        const messageHtml = `Hej!<br>
+<br>
+Ditt tvättpass mellan ${dateformat(sessions[0].getStartTime(),"HH")} - ${dateformat(sessions[0].getEndTime(),"HH")} är slut. Du kan nu gå in på <a href="https://nipfjallet5.se/tvatt/">appen</a> och checka av passet. Detta måste göras för att kunna boka ett nytt pass.<br>
+<br>
+Mvh<br>
+Tvättappen<br>
+<br>
+${data.apartments_new[sessions[0].getApartment()].email}
+`
+const messageText = `Hej!
+
+Ditt tvättpass mellan ${dateformat(sessions[0].getStartTime(),"HH")} - ${dateformat(sessions[0].getEndTime(),"HH")} är slut. Du kan nu gå in på appen (https://nipfjallet5.se/tvatt) och checka av passet. Detta måste göras för att kunna boka ett nytt pass.
+
+Mvh
+Tvättappen
+
+${data.apartments_new[sessions[0].getApartment()].email}
+`
+
+        sendMail(messageHtml, messageText, data.apartments_new[sessions[0].getApartment()].email)
     }
 });
 
