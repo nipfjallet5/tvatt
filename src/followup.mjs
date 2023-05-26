@@ -85,7 +85,6 @@ Ditt tvättpass mellan ${dateformat(sessions[0].getStartTime(),"HH")} - ${datefo
 Mvh
 Tvättappen
 `
-
         sendMail(messageHtml, messageText, data.apartments_new[sessions[0].getApartment()].email)
     }
 });
