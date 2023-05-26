@@ -1,5 +1,5 @@
 import {HourBooking} from './hourBookingHTMLElement';
-import {BookingSession} from './bookingSessionHTMLElement';
+import {LaundrySession} from './laundrySessionHTMLElement';
 
 export class WeekSchedule extends HTMLElement {
 
@@ -225,7 +225,7 @@ export class WeekSchedule extends HTMLElement {
                 bookingElement.isOldBooking = bookingElement.endTime < currentTime;
                 bookingElement.isTodayBooking = bookingDate.getTime() === todayDate.getTime();
 
-                if (!this.sessions.hasOwnProperty(sessionKey)) this.sessions[sessionKey] = new BookingSession(bookingDate);
+                if (!this.sessions.hasOwnProperty(sessionKey)) this.sessions[sessionKey] = new LaundrySession(bookingDate);
                 this.sessions[sessionKey].addBookingHour(bookingElement);
                 this.sessions[sessionKey].isMySession = bookingElement.isMyBooking;
                 this.sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
@@ -234,7 +234,6 @@ export class WeekSchedule extends HTMLElement {
                 let slotElement = this.weekGrid.children('#' + b.year + '_' + b.month + '_' + b.day + '_' + b.hour);
 
                 if (slotElement.length > 0) {
-
                     slotElement.html('');
                     slotElement.append(bookingElement);
                 }
@@ -246,10 +245,8 @@ export class WeekSchedule extends HTMLElement {
                 const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
                 if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];
                 if (s.getStartTime() < currentTime && s.getEndTime() > currentTime) window.activeSession = s;
-                console.log(sessionIndex, s.getApartment());
+                // console.log(sessionIndex, s.getApartment());
             })
-            
-
             window.myOldSessions = Object.values(this.sessions).filter(s => s.isMySession && s.isOldSession);
             window.myTodaySessions = Object.values(this.sessions).filter(s => s.isMySession && s.isTodaySession);
 

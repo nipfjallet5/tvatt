@@ -70,7 +70,7 @@ export class Booking {
 }
 
 
-export class BookingSession {
+export class LaundrySession {
 
     constructor(date) {
         this.bookings = [];
@@ -126,7 +126,7 @@ async function getAllSessions(password) {
     const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
 
     const data = await dropbox.filesListFolder({path: ''});
-    let bookingSessions = data.result.entries
+    let laundrySessions = data.result.entries
         .filter(booking => booking.name.startsWith("slot_"))
         .map(booking => {
             let bookingData = {
@@ -145,15 +145,15 @@ async function getAllSessions(password) {
             const booking = new Booking(b);
             booking.isOldBooking = booking.endTime < currentTime;
             booking.isTodayBooking = bookingDate.getTime() === todayDate.getTime();
-            if (!sessions.hasOwnProperty(sessionKey)) sessions[sessionKey] = new BookingSession(bookingDate);
+            if (!sessions.hasOwnProperty(sessionKey)) sessions[sessionKey] = new LaundrySession(bookingDate);
             sessions[sessionKey].addBookingHour(booking);
             sessions[sessionKey].isOldSession = booking.isOldBooking;
             sessions[sessionKey].isTodaySession = booking.isTodayBooking;
             return sessions;
         }, {})
 
-    const sortedSessions = Object.values(bookingSessions).sort((a,b) => a.getStartTime() - b.getStartTime());
-    const allSessions = Object.values(bookingSessions);
+    const sortedSessions = Object.values(laundrySessions).sort((a,b) => a.getStartTime() - b.getStartTime());
+    const allSessions = Object.values(laundrySessions);
     allSessions.forEach(s => {
         const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
         if (sessionIndex < allSessions.length - 1) s.followingSession = sortedSessions[sessionIndex + 1];

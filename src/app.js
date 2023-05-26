@@ -1,5 +1,4 @@
 import buildInfo from '../buildInfo.json'
-import {OlderBooking} from './elements/olderBookingHTMLElement'
 import {WeekSchedule} from './elements/weekScheduleHTMLElement'
 import {WeekSelector} from './elements/weekSelectorHTMLElement'
 
@@ -11,7 +10,6 @@ window.haveOldSessions = false;
 let weekSelector;
 let weekSchedule;
 let version = 1;
-let allBookings = {};
 
 Date.prototype.getWeek = function() {
     let date = new Date(this.getTime());
