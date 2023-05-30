@@ -2,7 +2,9 @@ name: Manual Trigger Workflow
 
 on:
   workflow_dispatch:
-
+  schedule:
+    - cron: "20 */1 * * *"
+  
 jobs:
 
   build:
@@ -21,20 +23,12 @@ jobs:
         uses: actions/checkout@v3
       - name: test gh
         run: |
-            gh workflow list
-            today=`date '+%Y-%m-%d'` -d '-1 day'
-            echo "${today}"
+            starttime=`date '+%Y-%m-%dT%H:%M:%S' -d '-24 hour'`
+            endtime=`date '+%Y-%m-%dT%H:%M:%S'`
+            echo "${starttime}"
+            echo "${endtime}"            
             gh api repos/nipfjallet5/tvatt/actions/runs --paginate | \
-            jq --arg v1 "${today}T00:00:00Z" --arg v2 "${today}T23:59:59Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2)' | \
-            jq '.id' | \
-            xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
-env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            jq --arg v1 "${starttime}Z" --arg v2 "${endtime}Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2)' | \
+            jq '.id'
 
-# # today=`date '+%Y-%m-%d'` -d '-1 day'
-# today=`date '+%Y-%m-%d'`
-# echo "${today}"
-
-# gh api repos/nipfjallet5/tvatt/actions/runs --paginate | \
-# jq --arg v1 "${today}T00:00:00Z" --arg v2 "${today}T23:59:59Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2)' | \
-# jq '.id'
+          # xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
