@@ -24,4 +24,5 @@ jobs:
 #gh api repos/nipfjallet5/tvatt/actions/runs --paginate | jq '.workflow_runs[] | select(.run_started_at > "2023-05-29T00:00:00Z") | select(.run_started_at < "2023-05-29T23:59:59Z")' | jq '.id'
 #gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/5087202810
 
+#date '+%Y-%m-%d'
 #gh api repos/nipfjallet5/tvatt/actions/runs --paginate | jq '.workflow_runs[] | select(.run_started_at > "2023-05-27T00:00:00Z") | select(.run_started_at < "2023-05-27T23:59:59Z")' | jq '.id' | xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
