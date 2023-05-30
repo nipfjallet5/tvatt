@@ -1,8 +1,8 @@
 name: followup check
 # on: [push]
 on:
-  push:
-    branches: [main]
+  # push:
+  #   branches: [main]
   schedule:
     # - cron: "*/5 * * * *"
     - cron: "10 */1 * * *"
@@ -18,6 +18,15 @@ jobs:
       - run: ls -al
       - run: npm install
       - run: node src/followup.mjs ${{ secrets.PORT_PIN }}
+      - run: |
+            starttime=`date '+%Y-%m-%dT%H:%M:%S' -d '-1 hour'`
+            endtime=`date '+%Y-%m-%dT%H:%M:%S'`
+            echo "${starttime}"
+            echo "${endtime}"            
+            gh api repos/nipfjallet5/tvatt/actions/runs --paginate | \
+            jq --arg v1 "${starttime}Z" --arg v2 "${endtime}Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2)' | \
+            jq '.id' | \
+            xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
 
 
 #gh run list --json name,startedAt,databaseId | jq '[.[] | select(.startedAt > "2023-05-28T00:00:00Z")]'
