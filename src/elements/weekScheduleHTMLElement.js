@@ -230,7 +230,7 @@ export class WeekSchedule extends HTMLElement {
                 this.sessions[sessionKey].isMySession = bookingElement.isMyBooking;
                 this.sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
                 this.sessions[sessionKey].isTodaySession = bookingElement.isTodayBooking;
-
+ 
                 let slotElement = this.weekGrid.children('#' + b.year + '_' + b.month + '_' + b.day + '_' + b.hour);
 
                 if (slotElement.length > 0) {
