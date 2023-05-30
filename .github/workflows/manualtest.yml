@@ -3,7 +3,7 @@ name: Manual Trigger Workflow
 on:
   workflow_dispatch:
   schedule:
-    - cron: "20 */1 * * *"
+    - cron: " */1 * * *"
   
 jobs:
 
@@ -23,12 +23,14 @@ jobs:
         uses: actions/checkout@v3
       - name: test gh
         run: |
-            starttime=`date '+%Y-%m-%dT%H:%M:%S' -d '-24 hour'`
+            starttime=`date '+%Y-%m-%dT%H:%M:%S' -d '-1 hour'`
             endtime=`date '+%Y-%m-%dT%H:%M:%S'`
             echo "${starttime}"
             echo "${endtime}"            
             gh api repos/nipfjallet5/tvatt/actions/runs --paginate | \
             jq --arg v1 "${starttime}Z" --arg v2 "${endtime}Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2)' | \
             jq '.id'
+env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           # xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
