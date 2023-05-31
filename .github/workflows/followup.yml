@@ -27,3 +27,6 @@ jobs:
             jq --arg v1 "${starttime}Z" --arg v2 "${endtime}Z" '.workflow_runs[] | select(.run_started_at > $v1) | select(.run_started_at < $v2) | select(.display_title == "followup check")' | \
             jq '.id' | \
             xargs -I {} gh api -X DELETE repos/nipfjallet5/tvatt/actions/runs/{}
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
