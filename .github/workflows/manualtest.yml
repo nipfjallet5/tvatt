@@ -2,8 +2,8 @@ name: Manual Trigger Workflow
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "10 */1 * * *"
+  # schedule:
+  #   - cron: "10 */1 * * *"
   
 jobs:
 
