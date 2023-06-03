@@ -6,9 +6,11 @@ export class WeekSchedule extends HTMLElement {
     constructor() {
         super();
 
-        this.sessions = {}
+        this.sessions = {};
+        this.cleanings = {};
         this.readyHandler = () => {};
         this.bookingClickHandler = () => {};
+        this.cleaningClickHandler = () => {};
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -53,13 +55,27 @@ export class WeekSchedule extends HTMLElement {
                     font-weight: bold;
                     text-shadow: none;
                 }
+                .clean-slot-item {
+                    /* background-color: #e9e9e9;
+                    border: 1px solid rgba(0, 0, 0, 0.3); */
+                    /* border-radius: 3px; */
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    font-weight: bold;
+                    text-shadow: none;
+                }
                 .check-item {
                     background-color: #e9e9e9;
                     border: 1px solid rgba(0, 0, 0, 0.3);
                     border-radius: 3px;
+                    font-size: 12px;
+                    height: 30px;
+                    line-height: 30px;
                     text-align: center;
                     font-weight: bold;
                     text-shadow: none;
+                    /* display: none; */
                 }
                 #weekNumberElement {
                     background-color: black;
@@ -138,8 +154,8 @@ export class WeekSchedule extends HTMLElement {
             this.weekGrid.append(dateHeaderElement);
         }
 
-        for (let hour = 7; hour<=22; hour++) {
-            this.weekGrid.append($('<div>').addClass('hour-item').html(hour));
+        for (let hour = 7; hour<=23; hour++) {
+            this.weekGrid.append($('<div>').addClass(hour<=22 ? 'hour-item' : 'check-row').html(hour<=22 ? hour : ''));
 
             for (let day = 0; day <= 6; day++) {
 
@@ -147,59 +163,80 @@ export class WeekSchedule extends HTMLElement {
                 let month = weekInfo.mondayDate.getDayOffset(day).getMonth() + 1;
                 let date = weekInfo.mondayDate.getDayOffset(day).getDate();
 
-                let slotContainer = $('<div>')
-                    .addClass('slot-item')
-                    .attr('id', year + '_' + month + '_' + date + '_' + hour)
-                    .data({
-                        apartment: localStorage.getItem('apartment'),
-                        year: year,
-                        month: month,
-                        day: date,
-                        hour: hour,
-                        identifier: year + '' + month + '' + date + '' + hour
-                    })
-                    .click(function() {
-                        if ($(this).children().length === 0) {
+                if (hour <= 22) {
+    
+                    let slotContainer = $('<div>')
+                        .addClass('slot-item')
+                        .attr('id', year + '_' + month + '_' + date + '_' + hour)
+                        .data({
+                            apartment: localStorage.getItem('apartment'),
+                            year: year,
+                            month: month,
+                            day: date,
+                            hour: hour,
+                            identifier: year + '' + month + '' + date + '' + hour
+                        })
+                        .click(function() {
+                            if ($(this).children().length === 0) {
+    
+                                const bookingElement = new HourBooking($(this).data(), true);
+    
+                                bookingElement.onCreate(status => {
+                                    self.bookingClickHandler(status, this.sessions);
+                                });
+    
+                                bookingElement.onDelete(status => {
+                                    self.bookingClickHandler(status, this.sessions);
+                                });
+    
+                                $(this).append(bookingElement);
+                            }
+                            // else {
+                            //     let booking = $(this).children('hour-booking');
+                            //     if (booking[0].data.apartment === localStorage.getItem('apartment')) {
+                            //         booking[0].delete();
+                            //     }
+                            //     else {
+                            //         //TODO ...
+                            //         // alert(booking[0].data.apartment)
+                            //     }
+                            // }
+                        })
+                        .appendTo(this.weekGrid);
+    
+                    if (weekInfo.mondayDate.getDayOffset(day).isSameDay(currentDate)) slotContainer.addClass('date-today');
+                }
+                else {
 
-                            const bookingElement = new HourBooking($(this).data(), true);
-
-                            bookingElement.onCreate(status => {
-                                self.bookingClickHandler(status, this.sessions);
-                            });
-
-                            bookingElement.onDelete(status => {
-                                self.bookingClickHandler(status, this.sessions);
-                            });
-
-                            $(this).append(bookingElement);
-                        }
-                        // else {
-                        //     let booking = $(this).children('hour-booking');
-                        //     if (booking[0].data.apartment === localStorage.getItem('apartment')) {
-                        //         booking[0].delete();
-                        //     }
-                        //     else {
-                        //         //TODO ...
-                        //         // alert(booking[0].data.apartment)
-                        //     }
-                        // }
-                    })
-                    .appendTo(this.weekGrid);
-
-                if (weekInfo.mondayDate.getDayOffset(day).isSameDay(currentDate)) slotContainer.addClass('date-today');
-
+                    if (currentDate - weekInfo.mondayDate.getDayOffset(day) >= 0) {
+                        let checkContainer = $('<div>')
+                        .addClass('clean-slot-item')
+                        // .html('<i class="fa-solid fa-bucket"></i>')
+                        .attr('id', 'clean_' + year + month + date)
+                        // .data({
+                        //     apartment: localStorage.getItem('apartment'),
+                        //     year: year,
+                        //     month: month,
+                        //     day: date,
+                        //     identifier: year + '' + month + '' + date
+                        // })
+                        // .click(function() {
+                        //     console.log($(this).data());
+                        //     window.dropbox.filesListFolder({path: '/checks/'})
+                        //     .then(data => {
+                        //         self.cleaningClickHandler(['a', 'b'])
+                        //     })
+                        // })
+                        .appendTo(this.weekGrid);
+                    }
+                }
             }
         }
 
-        // this.weekGrid.append($('<div>').addClass('hour-item'));
-        // for (let day = 0; day <= 6; day++) {
-        //     let checkContainer = $('<div>').addClass('check-item').html('✔').appendTo(this.weekGrid)
-
-        // }
-
-        $.when(this.getBookings()).done(data => {
+        $.when(this.getBookings(), this.getCleanings()).done((data, cdata) => {
 
             this.sessions = {}
+            this.cleanings = {}
 
             const currentTime = new Date();
             const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
@@ -238,6 +275,26 @@ export class WeekSchedule extends HTMLElement {
                     slotElement.append(bookingElement);
                 }
             });
+
+            cdata.forEach(cd => {
+                if (!this.cleanings.hasOwnProperty(cd.identifier)) this.cleanings[cd.identifier] = [];
+                this.cleanings[cd.identifier].push(cd);
+                const slotElement = this.weekGrid.children('#clean_' + cd.identifier);
+                slotElement.html('');
+                let checkContainer = $('<div>')
+                .addClass('clean-item')
+                // .html('<i class="fa-solid fa-check"></i>')
+                .html('\u2714')
+                .data(cd)
+                .click(function() {
+                    window.dropbox.filesListFolder({path: '/checks/'})
+                    .then(data => {
+                        self.cleaningClickHandler(self.cleanings[$(this).data().identifier])
+                    })
+                })
+                .appendTo(slotElement);
+                $('#clean_' + cd.identifier).css('display','block');
+            })
 
             const sortedSessions = Object.values(this.sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
             const allSessions = Object.values(this.sessions);
@@ -319,12 +376,38 @@ export class WeekSchedule extends HTMLElement {
         return fetchTask;
     };
 
+    getCleanings() {
+        let fetchTask = new $.Deferred();
+        window.dropbox.filesListFolder({path: '/checks/'})
+        .then(data => {
+            fetchTask.resolve(data.entries.map(d => {
+                const tokens = d.name.split('_')
+                var cleanCode = (tokens[6]-0).toString(2);
+                cleanCode = '0000000000'.substring(cleanCode.length) + cleanCode;
+                return {
+                    apartment: tokens[1],
+                    nextApartment: tokens[2],
+                    year: tokens[3]-0,
+                    month: tokens[4]-1,
+                    day: tokens[5]-0,
+                    identifier: tokens[3] + tokens[4] + tokens[5],
+                    cleanCode: cleanCode,
+                };
+            }))
+        })
+        return fetchTask;
+    }
+
     reload() {
         this.setWeek(this.weekInfo);
     }
 
     onBookingClick(handler) {
         this.bookingClickHandler = handler;
+    }
+
+    onCleaningClick(handler) {
+        this.cleaningClickHandler = handler;
     }
 
     onReady(handler) {

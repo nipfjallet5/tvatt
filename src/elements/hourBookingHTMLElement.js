@@ -3,6 +3,7 @@ export class HourBooking extends HTMLElement {
     constructor(data, doFetch) {
         super();
 
+        this.isAdmin = localStorage.getItem('apartment') == 122;
         this.data = data;
         this.isMyBooking = false;
         this.isTodayBooking = false;
@@ -59,7 +60,7 @@ export class HourBooking extends HTMLElement {
         this.container[0].addEventListener('click', event => {
             console.log('BOOKING CLICKED', this.data.apartment, localStorage.getItem('apartment'));
 
-            if (window.haveOldSessions) {
+            if (window.haveOldSessions && !this.isAdmin) {
                 console.log('HAVE OLD SESSIONS. NOT DELETING!');
                 this.deleteHandler('haveOldSessionsDelete');
                 return false;
@@ -75,7 +76,7 @@ export class HourBooking extends HTMLElement {
                 }
             }
 
-            if (this.data.apartment === localStorage.getItem('apartment') || localStorage.getItem('apartment') == 122) {
+            if (this.data.apartment === localStorage.getItem('apartment') || this.isAdmin) {
                 this.delete();
             }
         });
@@ -91,7 +92,7 @@ export class HourBooking extends HTMLElement {
             if (data[0].matches.length === 0) {
                 const currentTime = new Date();
 
-                if (currentTime > this.startTime) {
+                if ((currentTime > this.startTime) && (!this.isAdmin)) {
                     console.log('TOO EARLY. NOT ADDING!');
                     this.createHandler('tooEarlyBooking');
                     this.remove();
@@ -132,6 +133,7 @@ export class HourBooking extends HTMLElement {
             if (this.container) this.container.html('...');
             console.log('DELETING', this.bookingName);
             window.dropbox.filesDelete({path: "/" + this.bookingName}) //delete when canceling
+            // window.dropbox.filesMove({from_path: "/" + this.bookingName, to_path: "/deleted/" + this.bookingName}) //delete when canceling
                 .then((status) =>  {
                     $(this).remove();
                     resolve(status);
@@ -150,4 +152,5 @@ export class HourBooking extends HTMLElement {
         this.deleteHandler = handler;
     }
 }
+
 window.customElements.define('hour-booking', HourBooking);

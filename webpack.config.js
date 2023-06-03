@@ -58,7 +58,8 @@ module.exports = {
     // node: { fs: 'empty' },
     devServer: {
         host: '0.0.0.0',
-        port:5000,
+        disableHostCheck: true,
+        port:8080,
         // contentBase: path.join(__dirname, '../webapp'),
         // inline: true,
         hot: true,

@@ -1,6 +1,7 @@
 import buildInfo from '../buildInfo.json'
 import {WeekSchedule} from './elements/weekScheduleHTMLElement'
 import {WeekSelector} from './elements/weekSelectorHTMLElement'
+import {CleaningSlot} from './elements/cleaningSlotHTMLElement'
 
 window.myOldSessions = [];
 window.myTodaySessions = [];
@@ -115,6 +116,14 @@ function manageActiveSessions(message) {
     $('#todayBookingsList').append(as);
 }
 
+function manageCleanings(data) {
+    $('#todayBookingsList').html('');
+    $('#todaySessionPanel').panel('open');
+    data.forEach(d => {
+        $('#todayBookingsList').append(new CleaningSlot(d));
+    })
+}
+
 let loadApp = function(){
 
     window.dropbox = new Dropbox.Dropbox({
@@ -169,6 +178,10 @@ let loadApp = function(){
         }
     })
 
+    weekSchedule[0].onCleaningClick((data) => {
+        manageCleanings(data);
+    })
+
     content.append(weekSelector);
     content.append(weekSchedule);
 
@@ -179,55 +192,70 @@ let loadApp = function(){
 };
 
 let fetchEnc = function(name, password, key){
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         fetch(`assets/enc/${name}.json.enc`)
         .then(response => response.text())
         .then(encData => {
-            resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
+            try {
+                resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
+                console.log('PASSWORD OK');
+                
+            }
+            catch(e) {
+                reject('PASSWORD NOT OK')
+            }
         })      
     })
 }
 
-let loadEnc = async function(password) {
+export async function loadEnc(password) {
 
-    const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
-    const dbToken = dum[0].token;
-    const apartmentInfo = dum[1];
+    try {
+        const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
+
+        const dbToken = dum[0].token;
+        const apartmentInfo = dum[1];
+        
+        if (apartmentInfo != null) {
     
-    if (apartmentInfo != null) {
-
-        $('#apartmentList').html('<p>Välj din lägenhet i listan.</p>');
-
-        $('#password').addClass('password-valid');
-
-        hideKeyboard($('#password'));
-
-        Object.entries(apartmentInfo.apartments).map(([apartmentNumber, name]) => {
-            $('<input type="button">')
-                .attr('value', apartmentNumber + '. ' + name)
-                .appendTo($('#apartmentList'))
-                .button({mini: true}).button('refresh')
-                .click(event => {
-                    console.log('selecting', apartmentNumber + '. ' + name);
-
-                    console.log('SAVING DATA IN LOCAL STORAGE AND LOADING APP.');
-
-                    localStorage.setItem('apartment', apartmentNumber);
-                    localStorage.setItem('name', name);
-                    localStorage.setItem('dbtoken', dbToken);
-                    localStorage.setItem('version', version);
-
-                    loadApp();
-                })
-                .parent().each((index,item) => {
-                    $(item).addClass('apartment-selector');
-                });
-        });
+            $('#apartmentList').html('<p>Välj din lägenhet i listan.</p>');
+    
+            $('#password').addClass('password-valid');
+    
+            hideKeyboard($('#password'));
+    
+            Object.entries(apartmentInfo.apartments).map(([apartmentNumber, name]) => {
+                $('<input type="button">')
+                    .attr('value', apartmentNumber + '. ' + name)
+                    .appendTo($('#apartmentList'))
+                    .button({mini: true}).button('refresh')
+                    .click(event => {
+                        console.log('selecting', apartmentNumber + '. ' + name);
+    
+                        console.log('SAVING DATA IN LOCAL STORAGE AND LOADING APP.');
+    
+                        localStorage.setItem('apartment', apartmentNumber);
+                        localStorage.setItem('name', name);
+                        localStorage.setItem('dbtoken', dbToken);
+                        localStorage.setItem('version', version);
+                        localStorage.setItem('password', password);
+                        localStorage.setItem('apartmentInfo', JSON.stringify(apartmentInfo));
+    
+                        loadApp();
+                    })
+                    .parent().each((index,item) => {
+                        $(item).addClass('apartment-selector');
+                    });
+            });
+        }
+        else {
+            $('#password').addClass('password-invalid');
+        }
+        return apartmentInfo;
     }
-    else {
-        $('#password').addClass('password-invalid');
+    catch(e) {
+        return {};
     }
-
 }
 
 $('#password').on('keyup',function(event) {
@@ -245,7 +273,9 @@ $('#password').on('keyup',function(event) {
 
 $(document).ready(function(){
     if (localStorage.getItem('version') !== null) {
-        if (Number.parseInt(localStorage.getItem('version')) >= version) {
+        console.log('VERSION', version, '(VERSION', localStorage.getItem('version'), 'FOUND IN LOCAL STORAGE)');
+        if (Number.parseInt(localStorage.getItem('version')) === version) {
+            console.log('LOADING APP');
             loadApp();
         }
     }
