@@ -117,6 +117,7 @@ function manageActiveSessions(message) {
 }
 
 function manageCleanings(data) {
+    $('#todaySessionPanelMessage').html(`Avcheckade pass ${data[0].year}-${data[0].month}-${data[0].day}<br><br>`);
     $('#todayBookingsList').html('');
     $('#todaySessionPanel').panel('open');
     data.forEach(d => {

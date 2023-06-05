@@ -20,24 +20,33 @@ export class CleaningSlot extends HTMLElement {
                     padding: 5px;
                     background-color: lightgrey;
                 }
+                .cleantask-title {
+                    padding-bottom: 5px;
+                    font-weight: bold;
+                }
                 .cleaning-checked {
-                    color: darkgreen
+                    font-size: 14px;
                 }
                 .cleaning-unchecked {
-                    color: darkred
+                    color: darkred;
+                    display: none;
+                }
+                .fa-check {
+                    color: darkgreen;
+                    font-weight: bold;
                 }
             </style>
 
             <div class="cleaning-container">
-                <div class="cleantask-title">${this.apartmentInfo.apartments_new[this.cleaningData.apartment].nick} (${this.cleaningData.apartment})<br> har checkat av:</div>
-                <div class="cleantask, ${this.checkMap[2] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">sopat golvet</div></div>
-                <div class="cleantask, ${this.checkMap[3] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat golvet</div></div>
-                <div class="cleantask, ${this.checkMap[4] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat ytor</div></div>
-                <div class="cleantask, ${this.checkMap[5] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">ludd torktumlare</div></div>
-                <div class="cleantask, ${this.checkMap[6] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">filter torkskåp</div></div>
-                <div class="cleantask, ${this.checkMap[7] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">rengjort fack</div></div>
-                <div class="cleantask, ${this.checkMap[8] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">städade inte</div></div>
-                <div class="cleantask, ${this.checkMap[9] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">tvättade aldrig</div></div>
+                <div class="cleantask-title">${this.apartmentInfo.apartments_new[this.cleaningData.apartment].nick} (${this.cleaningData.start}:00)</div>
+                <div class="cleantask, ${this.checkMap[2] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">sopat golvet <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[3] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat golvet <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[4] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat ytor <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[5] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">filter tumlare <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[6] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">filter torkskåp <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[7] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">rengjort fack <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[8] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">städade inte <i class="fa fa-check" aria-hidden="true"></i></div></div>
+                <div class="cleantask, ${this.checkMap[9] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">tvättade aldrig <i class="fa fa-check" aria-hidden="true"></i></div></div>
             </div>
 
         `;

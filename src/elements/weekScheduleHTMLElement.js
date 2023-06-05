@@ -392,8 +392,9 @@ export class WeekSchedule extends HTMLElement {
                     day: tokens[5]-0,
                     identifier: tokens[3] + tokens[4] + tokens[5],
                     cleanCode: cleanCode,
+                    start: Number.parseInt(tokens[7])
                 };
-            }))
+            }).sort((a,b) => a.start - b.start))
         })
         return fetchTask;
     }
