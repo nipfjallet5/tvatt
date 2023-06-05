@@ -158,7 +158,8 @@ export class LaundrySession extends HTMLElement {
             this.bookings[0].data.year + "_" +
             this.bookings[0].data.month + "_" +
             this.bookings[0].data.day + "_" +
-            this.cleanCode;
+            this.cleanCode + "_" +
+            this.bookings[0].data.hour + "_"
 
             Promise.all(this.bookings.map(b => b.delete())).then(statuses => {
                 console.log(statuses);
