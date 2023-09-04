@@ -38,7 +38,7 @@ export class CleaningSlot extends HTMLElement {
             </style>
 
             <div class="cleaning-container">
-                <div class="cleantask-title">${this.apartmentInfo.apartments_new[this.cleaningData.apartment].nick} (${this.cleaningData.start}:00)</div>
+                <div class="cleantask-title">${this.apartmentInfo.apartments_new[this.cleaningData.apartment].nick} (${this.cleaningData.day}/${this.cleaningData.month} ${this.cleaningData.start}:00)</div>
                 <div class="cleantask, ${this.checkMap[2] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">sopat golvet <i class="fa fa-check" aria-hidden="true"></i></div></div>
                 <div class="cleantask, ${this.checkMap[3] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat golvet <i class="fa fa-check" aria-hidden="true"></i></div></div>
                 <div class="cleantask, ${this.checkMap[4] ? 'cleaning-checked' : 'cleaning-unchecked'}"><div style="height: 20px">våttorkat ytor <i class="fa fa-check" aria-hidden="true"></i></div></div>

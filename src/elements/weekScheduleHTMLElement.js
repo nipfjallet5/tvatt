@@ -65,17 +65,8 @@ export class WeekSchedule extends HTMLElement {
                     font-weight: bold;
                     text-shadow: none;
                 }
-                .check-item {
-                    background-color: #e9e9e9;
-                    border: 1px solid rgba(0, 0, 0, 0.3);
-                    border-radius: 3px;
-                    font-size: 12px;
-                    height: 30px;
-                    line-height: 30px;
-                    text-align: center;
-                    font-weight: bold;
-                    text-shadow: none;
-                    /* display: none; */
+                .clean-item {
+                    font-size: 20px;
                 }
                 #weekNumberElement {
                     background-color: black;
@@ -211,22 +202,7 @@ export class WeekSchedule extends HTMLElement {
                     if (currentDate - weekInfo.mondayDate.getDayOffset(day) >= 0) {
                         let checkContainer = $('<div>')
                         .addClass('clean-slot-item')
-                        // .html('<i class="fa-solid fa-bucket"></i>')
                         .attr('id', 'clean_' + year + month + date)
-                        // .data({
-                        //     apartment: localStorage.getItem('apartment'),
-                        //     year: year,
-                        //     month: month,
-                        //     day: date,
-                        //     identifier: year + '' + month + '' + date
-                        // })
-                        // .click(function() {
-                        //     console.log($(this).data());
-                        //     window.dropbox.filesListFolder({path: '/checks/'})
-                        //     .then(data => {
-                        //         self.cleaningClickHandler(['a', 'b'])
-                        //     })
-                        // })
                         .appendTo(this.weekGrid);
                     }
                 }
@@ -283,8 +259,8 @@ export class WeekSchedule extends HTMLElement {
                 slotElement.html('');
                 let checkContainer = $('<div>')
                 .addClass('clean-item')
-                // .html('<i class="fa-solid fa-check"></i>')
-                .html('\u2714')
+                .html('<i class="fa-solid fa-square-check"></i>')
+                // .html('\u2714')
                 .data(cd)
                 .click(function() {
                     window.dropbox.filesListFolder({path: '/checks/'})

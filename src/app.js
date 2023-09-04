@@ -10,7 +10,7 @@ window.haveOldSessions = false;
 // let dropbox;
 let weekSelector;
 let weekSchedule;
-let version = 1;
+let version = 2;
 
 Date.prototype.getWeek = function() {
     let date = new Date(this.getTime());
@@ -117,7 +117,7 @@ function manageActiveSessions(message) {
 }
 
 function manageCleanings(data) {
-    $('#todaySessionPanelMessage').html(`Avcheckade pass ${data[0].year}-${data[0].month}-${data[0].day}<br><br>`);
+    $('#todaySessionPanelMessage').html(`pass avcheckade  ${data[0].day}/${data[0].month}<br><br>`);
     $('#todayBookingsList').html('');
     $('#todaySessionPanel').panel('open');
     data.forEach(d => {

@@ -83,13 +83,11 @@ export class HourBooking extends HTMLElement {
 
         if (!this.doFetch) return;
 
-        let searchPromises = [
-            window.dropbox.filesSearch({path: '', query: this.data.identifier}),
-            // dropbox.filesSearch({path: '', query: 'lgh' + this.data.apartment})
-        ];
+        window.dropbox.filesSearch({path: '', query: this.data.identifier}).then(data => {
 
-        Promise.all(searchPromises).then(data => {
-            if (data[0].matches.length === 0) {
+            const matches = data.matches.filter(m => m.metadata.name.includes('_' + this.data.identifier + '_'));
+
+            if (matches.length === 0) {
                 const currentTime = new Date();
 
                 if ((currentTime > this.startTime) && (!this.isAdmin)) {
@@ -113,10 +111,11 @@ export class HourBooking extends HTMLElement {
                     }, () => {console.log('an error occured');})
             }
             else {
-                console.log("slot is taken");
+                console.log("SLOT IS TAKEN. NOT ADDING!", this.data.identifier);
                 $(this).remove();
-                weekSchedule[0].reload();
                 alert('tiden har bokats av någon annan efter att du gick in på sidan');
+                // return;
+                weekSchedule[0].reload();
             }
         });
     }
