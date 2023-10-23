@@ -4,7 +4,7 @@
   "description": "",
   "main": "tvatt.js",
   "scripts": {
-    "dev": "webpack server --host 0.0.0.0",
+    "dev": "webpack server",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

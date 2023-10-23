@@ -57,9 +57,10 @@ module.exports = {
     },
     // node: { fs: 'empty' },
     devServer: {
-        host: '0.0.0.0',
+        // host: 'localhost',
+        // host: '0.0.0.0',
         disableHostCheck: true,
-        port:8080,
+        port: 8888,
         // contentBase: path.join(__dirname, '../webapp'),
         // inline: true,
         hot: true,
