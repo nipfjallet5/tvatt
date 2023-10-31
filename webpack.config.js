@@ -22,9 +22,9 @@ module.exports = {
         // library: 'tvattlib',
         // libraryTarget: 'umd'
     },
-    // resolve: {
-    //     fallback: { "crypto": false, "path": false, "fs": false}
-    // },
+    resolve: {
+        fallback: {"crypto": false, "path": false, "fs": false, util: false}
+    },
     module: {
         rules: [
             {

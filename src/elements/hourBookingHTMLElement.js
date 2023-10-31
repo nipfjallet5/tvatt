@@ -88,7 +88,8 @@ export class HourBooking extends HTMLElement {
         ];
 
         Promise.all(searchPromises).then(data => {
-            if (data[0].matches.length === 0) {
+            
+            if (data[0].result.matches.length === 0) {
                 const currentTime = new Date();
 
                 if (currentTime > this.startTime) {

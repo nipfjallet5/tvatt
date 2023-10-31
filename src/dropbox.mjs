@@ -21,7 +21,7 @@ function toSE(date) {
 
 export function fetchEnc(name, password){
     return new Promise(resolve => {
-        fs.readFile(`assets/enc/${name}.json.enc`, 'utf8', (err, encData) => {
+        fs.readFile(`assets/private/enc/${name}.json.enc`, 'utf8', (err, encData) => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
         })
     })
@@ -113,11 +113,14 @@ export class LaundrySession {
 
 async function getAllSessions(password) {
 
-    const dbtoken = (await fetchEnc('dbtoken', password)).token;
+    const dbcreds = (await fetchEnc('dbcreds', password));
+    // console.log(dbcreds);
 
     const dropbox = new db.Dropbox({
         fetch: fetch,
-        accessToken: dbtoken
+        clientId: dbcreds.clientID,
+        clientSecret: dbcreds.clientSecret,
+        refreshToken: dbcreds.refreshToken
     });
 
     const currentDate = new Date();
@@ -188,4 +191,10 @@ export async function getRecentlyFinishedSession(password, delay) {
     });
     // return [allSessions[1]];
 
+}
+
+if (!(typeof module !== 'undefined' && !module.children)) {
+    let password = CryptoJS.SHA256(process.argv[2]).toString();
+    const allSessions = await getAllSessions(password);
+    console.log(allSessions.length);
 }

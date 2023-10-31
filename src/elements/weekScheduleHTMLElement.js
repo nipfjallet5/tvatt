@@ -270,7 +270,7 @@ export class WeekSchedule extends HTMLElement {
         window.dropbox.filesListFolder({path: ''})
             .then(data => {
     
-                let bookings = data.entries
+                let bookings = data.result.entries
                     .filter(booking => booking.name.startsWith("slot_"))
                     .map(booking => {
                         let bookingData = {
@@ -285,7 +285,7 @@ export class WeekSchedule extends HTMLElement {
                         return bookingData;
                     });
     
-                let duplicateBookings = data.entries
+                let duplicateBookings = data.result.entries
                     .filter(booking => booking.name.startsWith("slot_"))
                     .map(booking => {
                         // console.log(booking.name, booking.server_modified);
@@ -294,7 +294,7 @@ export class WeekSchedule extends HTMLElement {
                     .reduce((acc, el, i, arr) => {
                         if (arr.indexOf(el) !== arr.lastIndexOf(el)) {
                             if (!acc.hasOwnProperty(el)) acc[el] = [];
-                            acc[el].push(data.entries[i]);
+                            acc[el].push(data.result.entries[i]);
                         }
                         return acc;
                     }, {});

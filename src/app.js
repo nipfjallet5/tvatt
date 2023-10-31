@@ -1,6 +1,7 @@
 import buildInfo from '../buildInfo.json'
 import {WeekSchedule} from './elements/weekScheduleHTMLElement'
 import {WeekSelector} from './elements/weekSelectorHTMLElement'
+// import {Dropbox} from 'dropbox';
 
 window.myOldSessions = [];
 window.myTodaySessions = [];
@@ -117,9 +118,17 @@ function manageActiveSessions(message) {
 
 let loadApp = function(){
 
-    window.dropbox = new Dropbox.Dropbox({
-        fetch: fetch,
-        accessToken: localStorage.getItem('dbtoken')
+    // console.log(localStorage.getItem('clientID'));
+    // console.log(localStorage.getItem('clientSecret'));
+    // console.log(localStorage.getItem('refreshToken'));
+    // console.log(localStorage.getItem('accessToken'));
+
+    window.dropbox = new Dropbox.Dropbox({ 
+        fetch: fetch.bind(window),
+        clientId: localStorage.getItem('clientID'),
+        clientSecret: localStorage.getItem('clientSecret'),
+        // accessToken: localStorage.getItem('accessToken'),
+        refreshToken: localStorage.getItem('refreshToken')
     });
 
     let content = $('#content');
@@ -180,7 +189,7 @@ let loadApp = function(){
 
 let fetchEnc = function(name, password, key){
     return new Promise(resolve => {
-        fetch(`assets/enc/${name}.json.enc`)
+        fetch(`assets/private/enc/${name}.json.enc`)
         .then(response => response.text())
         .then(encData => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
@@ -190,10 +199,11 @@ let fetchEnc = function(name, password, key){
 
 let loadEnc = async function(password) {
 
-    const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password)]);
+    const dum = await Promise.all([fetchEnc('dbtoken', password), fetchEnc('data', password), fetchEnc('dbcreds', password)]);
     const dbToken = dum[0].token;
     const apartmentInfo = dum[1];
-    
+    const dbCreds = dum[2];
+
     if (apartmentInfo != null) {
 
         $('#apartmentList').html('<p>Välj din lägenhet i listan.</p>');
@@ -215,6 +225,10 @@ let loadEnc = async function(password) {
                     localStorage.setItem('apartment', apartmentNumber);
                     localStorage.setItem('name', name);
                     localStorage.setItem('dbtoken', dbToken);
+                    localStorage.setItem('clientID', dbCreds.clientID);
+                    localStorage.setItem('clientSecret', dbCreds.clientSecret);
+                    localStorage.setItem('refreshToken', dbCreds.refreshToken);
+                    localStorage.setItem('accessToken', dbCreds.accessToken);
                     localStorage.setItem('version', version);
 
                     loadApp();
