@@ -21,7 +21,7 @@ function toSE(date) {
 
 export function fetchEnc(name, password){
     return new Promise(resolve => {
-        fs.readFile(`assets/private/enc/${name}.json.enc`, 'utf8', (err, encData) => {
+        fs.readFile(`assets/enc/${name}.json.enc`, 'utf8', (err, encData) => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));
         })
     })

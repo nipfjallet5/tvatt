@@ -189,7 +189,7 @@ let loadApp = function(){
 
 let fetchEnc = function(name, password, key){
     return new Promise(resolve => {
-        fetch(`assets/private/enc/${name}.json.enc`)
+        fetch(`assets/enc/${name}.json.enc`)
         .then(response => response.text())
         .then(encData => {
             resolve(JSON.parse(CryptoJS.AES.decrypt(encData, password).toString(CryptoJS.enc.Utf8)));

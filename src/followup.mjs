@@ -9,7 +9,7 @@ let password = CryptoJS.SHA256(process.argv[2]).toString();
 
 async function sendMail(messageHtml, messageText, address) {
 
-    const gauth = JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync('assets/private/enc/gauth.json.enc').toString(), password).toString(CryptoJS.enc.Utf8));
+    const gauth = JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync('assets/enc/gauth.json.enc').toString(), password).toString(CryptoJS.enc.Utf8));
 
     const OAuth2 = gapi.google.auth.OAuth2;
     const oauth2Client = new OAuth2(gauth.fakturor.client_id, gauth.fakturor.client_secret, 'https://developers.google.com/oauthplayground');
