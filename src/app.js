@@ -10,7 +10,7 @@ window.haveOldSessions = false;
 // let dropbox;
 let weekSelector;
 let weekSchedule;
-let version = 1;
+let version = 2;
 
 Date.prototype.getWeek = function() {
     let date = new Date(this.getTime());
