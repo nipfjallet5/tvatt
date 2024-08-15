@@ -184,14 +184,14 @@ export class LaundrySession extends HTMLElement {
             //     console.log('DELETING', checkName);
                 
 
-            //     // window.dropbox.filesDelete({path: "/" + bookingName}) //delete when checking off
+            //     // window.dropbox.filesDelete({path: "/bookings/" + bookingName}) //delete when checking off
             //     // .then(() =>  {
             //     //     console.log('booking deleted');
             //     //     this.remove();
             //     //     this.onDeleteHandler(this.key);
             //     //     weekSchedule[0].reload();
             //     //     overlay.style.visibility = "hidden";
-            //     //     window.dropbox.filesUpload({path: "/" + checkName, contents: "content"})
+            //     //     window.dropbox.filesUpload({path: "/bookings/" + checkName, contents: "content"})
             //     //         .then(() => {
             //     //         }, () => {console.log('an error occured');})
 

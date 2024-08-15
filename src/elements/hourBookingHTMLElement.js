@@ -83,7 +83,7 @@ export class HourBooking extends HTMLElement {
         if (!this.doFetch) return;
 
         let searchPromises = [
-            window.dropbox.filesSearch({path: '', query: this.data.identifier}),
+            window.dropbox.filesSearch({path: '/bookings', query: this.data.identifier}),
             // dropbox.filesSearch({path: '', query: 'lgh' + this.data.apartment})
         ];
 
@@ -106,7 +106,7 @@ export class HourBooking extends HTMLElement {
                     return;
                 }
 
-                window.dropbox.filesUpload({path: "/" + this.bookingName, contents: "content"}).then(() => {
+                window.dropbox.filesUpload({path: "/bookings/" + this.bookingName, contents: "content"}).then(() => {
                     this.container
                         .html(this.data.apartment);
                         this.createHandler('success');
@@ -132,7 +132,7 @@ export class HourBooking extends HTMLElement {
         return new Promise(resolve => {
             if (this.container) this.container.html('...');
             console.log('DELETING', this.bookingName);
-            window.dropbox.filesDelete({path: "/" + this.bookingName}) //delete when canceling
+            window.dropbox.filesDelete({path: "/bookings/" + this.bookingName}) //delete when canceling
                 .then((status) =>  {
                     $(this).remove();
                     resolve(status);

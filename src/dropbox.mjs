@@ -59,7 +59,7 @@ export class Booking {
     //     return new Promise(resolve => {
     //         if (this.container) this.container.html('...');
     //         console.log('DELETING', this.name);
-    //         window.dropbox.filesDelete({path: "/" + this.name}) //delete when canceling
+    //         window.dropbox.filesDelete({path: "/bookings/" + this.name}) //delete when canceling
     //             .then((status) =>  {
     //                 $(this).remove();
     //                 resolve(status);
@@ -128,7 +128,7 @@ async function getAllSessions(password) {
     const currentTime = new Date();
     const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
 
-    const data = await dropbox.filesListFolder({path: ''});
+    const data = await dropbox.filesListFolder({path: '/bookings'});
     let laundrySessions = data.result.entries
         .filter(booking => booking.name.startsWith("slot_"))
         .map(booking => {

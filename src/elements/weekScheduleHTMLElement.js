@@ -267,7 +267,7 @@ export class WeekSchedule extends HTMLElement {
 
         let fetchTask = new $.Deferred();
     
-        window.dropbox.filesListFolder({path: ''})
+        window.dropbox.filesListFolder({path: '/bookings'})
             .then(data => {
     
                 let bookings = data.result.entries
