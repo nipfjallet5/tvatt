@@ -152,9 +152,11 @@ export class LaundrySession extends HTMLElement {
 
             overlay.style.visibility = "visible";
 
+            const followingSession = this.followingSession ? this.followingSession.getApartment() + "_" : "000_";
+
             const checkName = "check_" +
             this.getApartment() + "_" +
-            this.followingSession.getApartment() + "_" +
+            followingSession +
             this.bookings[0].data.year + "_" +
             this.bookings[0].data.month + "_" +
             this.bookings[0].data.day + "_" +
