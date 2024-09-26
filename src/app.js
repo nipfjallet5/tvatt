@@ -145,12 +145,12 @@ let loadApp = function(){
             weekSchedule[0].slide('left');
         });
 
-        weekSelector.on('shiftWeekLeft', () => {
-            weekSchedule[0].slide('left');
-        });
-        weekSelector.on('shiftWeekRight', () => {
-            weekSchedule[0].slide('right');
-        });
+        // weekSelector.on('shiftWeekLeft', () => {
+        //     // weekSchedule[0].slide('left');
+        // });
+        // weekSelector.on('shiftWeekRight', () => {
+        //     // weekSchedule[0].slide('right');
+        // });
 
         weekSelector.on('setWeek', (event, weekInfo) => {
             weekSelector[0].enable(false);

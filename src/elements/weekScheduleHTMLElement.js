@@ -1,5 +1,5 @@
-import {HourBooking} from './hourBookingHTMLElement';
-import {LaundrySession} from './laundrySessionHTMLElement';
+import { HourBooking } from './hourBookingHTMLElement';
+import { LaundrySession } from './laundrySessionHTMLElement';
 
 export class WeekSchedule extends HTMLElement {
 
@@ -7,8 +7,8 @@ export class WeekSchedule extends HTMLElement {
         super();
 
         this.sessions = {}
-        this.readyHandler = () => {};
-        this.bookingClickHandler = () => {};
+        this.readyHandler = () => { };
+        this.bookingClickHandler = () => { };
 
         let template = document.createElement('template');
         template.innerHTML = /*html*/`
@@ -26,7 +26,9 @@ export class WeekSchedule extends HTMLElement {
                     height: 40px;
                 }
                 .date-today {
-                    background-color: #d1d1dc !important;
+                    background-color: lightgrey;
+                    pointer-events: none;
+                    
                 }
                 .date-today-day-element {
                     color: blue;
@@ -45,7 +47,9 @@ export class WeekSchedule extends HTMLElement {
                 }
                 .slot-item {
                     /*padding: 1px;*/
-                    background-color: #e9e9e9;
+                    background-color: lightgrey;
+                    pointer-events: none;
+                    /* background-color: #e9e9e9; */
                     border: 1px solid rgba(0, 0, 0, 0.3);
                     border-radius: 3px;
                     height: 22px;
@@ -81,21 +85,65 @@ export class WeekSchedule extends HTMLElement {
         this.weekGrid = $('#grid-container')
     }
 
+    async listAllFiles(dropbox, path) {
+        let files = [];
+        let hasMore = true;
+        let cursor = null;
+        let response;
+
+        const reply = {result: {entries: []}};
+        while (hasMore) {
+        // for (var i = 0; i < 10; i++) {
+            console.log(cursor);
+
+            // $('.slot-item').css({ 'background-color': 'pink' });
+
+            if (cursor) {
+                // If a cursor is available, continue from where we left off
+                response = await window.dropbox.filesListFolderContinue({ cursor });
+            } else {
+                // Initial request
+                response = await window.dropbox.filesListFolder({ path });
+
+            }
+
+
+            reply.result.entries = [...reply.result.entries, ...response.result.entries];
+            //   files = files.concat(response.entries);
+
+            hasMore = response.result.has_more;
+            console.log(response);
+
+            // If there are more files, get the cursor to continue
+            if (hasMore) {
+                cursor = response.result.cursor;
+            }
+            else {
+                cursor = null;
+            }
+        }
+
+        // $('.slot-item').css({ 'background-color': '#e9e9e9' });
+
+        return reply;
+    }
+
+
     slide(direction) {
         let elementWidth = this.weekGrid.width();
         let offsets = direction === 'right' ? [-elementWidth, elementWidth] : [elementWidth, -elementWidth];
-        $('#weekNumberElement').css({color: 'black'});
-        $('.date-element').css({color: 'white'});
+        $('#weekNumberElement').css({ color: 'black' });
+        $('.date-element').css({ color: 'white' });
 
         this.weekGrid.animate({
             left: offsets[0] + 'px'
-        },200, () => {
-            this.weekGrid.css({left: offsets[1] + 'px'});
+        }, 200, () => {
+            this.weekGrid.css({ left: offsets[1] + 'px' });
             this.weekGrid.animate({
                 left: "0px"
-            },200, () => {
-                $('#weekNumberElement').css({color: 'white'});
-                $('.date-element').css({color: 'black'});
+            }, 200, () => {
+                $('#weekNumberElement').css({ color: 'white' });
+                $('.date-element').css({ color: 'black' });
             })
         });
     }
@@ -116,9 +164,9 @@ export class WeekSchedule extends HTMLElement {
         this.weekGrid.html("");
         this.weekGrid
             .append($("<div>")
-            .attr('id', 'weekNumberElement')
-            .addClass('date-header-element')
-            .html('v' + weekInfo.weekNo));
+                .attr('id', 'weekNumberElement')
+                .addClass('date-header-element')
+                .html('v' + weekInfo.weekNo));
 
         for (let day = 0; day <= 6; day++) {
 
@@ -130,7 +178,7 @@ export class WeekSchedule extends HTMLElement {
             let dateElement = $('<div>')
                 .addClass('date-element')
                 // .html(weekInfo.mondayDate.getDayOffset(day).getDate() + "/"+ (weekInfo.mondayDate.getDayOffset(day).getMonth() + 1));
-                .html(weekInfo.mondayDate.getDayOffset(day).getDate() + " "+ months[(weekInfo.mondayDate.getDayOffset(day).getMonth())]);
+                .html(weekInfo.mondayDate.getDayOffset(day).getDate() + " " + months[(weekInfo.mondayDate.getDayOffset(day).getMonth())]);
 
             let dateHeaderElement = $('<div>').addClass('date-header-element').append(dayElement).append(dateElement);
             // if (weekInfo.mondayDate.getDayOffset(day).isSameDay(currentDate)) dateHeaderElement.addClass('date-today');
@@ -138,7 +186,7 @@ export class WeekSchedule extends HTMLElement {
             this.weekGrid.append(dateHeaderElement);
         }
 
-        for (let hour = 7; hour<=22; hour++) {
+        for (let hour = 7; hour <= 22; hour++) {
             this.weekGrid.append($('<div>').addClass('hour-item').html(hour));
 
             for (let day = 0; day <= 6; day++) {
@@ -158,7 +206,7 @@ export class WeekSchedule extends HTMLElement {
                         hour: hour,
                         identifier: year + '' + month + '' + date + '' + hour
                     })
-                    .click(function() {
+                    .click(function () {
                         if ($(this).children().length === 0) {
 
                             const bookingElement = new HourBooking($(this).data(), true);
@@ -191,23 +239,30 @@ export class WeekSchedule extends HTMLElement {
             }
         }
 
+
         // this.weekGrid.append($('<div>').addClass('hour-item'));
         // for (let day = 0; day <= 6; day++) {
         //     let checkContainer = $('<div>').addClass('check-item').html('✔').appendTo(this.weekGrid)
 
         // }
 
+
         $.when(this.getBookings()).done(data => {
+
+            $('.slot-item').css({ 'background-color': '#e9e9e9' });
+            $('.date-today').css({ 'background-color': '#d1d1dc' });
+            $('.slot-item').css({ 'pointer-events': 'auto'});
+            $('.date-today').css({ 'pointer-events': 'auto' });
 
             this.sessions = {}
 
             const currentTime = new Date();
-            const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
+            const todayDate = new Date(currentTime.getFullYear(), 0, 0, 0, 0);
             // ; todayDate.setHours(0); todayDate.setMinutes(0); todayDate.setSeconds(0); todayDate.setMilliseconds(0);
 
             data.forEach(b => {
 
-                const bookingDate = new Date(b.year, b.month-1, b.day);
+                const bookingDate = new Date(b.year, b.month - 1, b.day);
                 const sessionKey = b.apartment + '_' + b.year + '_' + b.month + '_' + b.day;
 
                 const bookingElement = new HourBooking(b, false);
@@ -220,7 +275,7 @@ export class WeekSchedule extends HTMLElement {
                     this.bookingClickHandler(status, this.sessions);
                 });
 
-                bookingElement.isMyBooking = b.apartment === localStorage.getItem('apartment');               
+                bookingElement.isMyBooking = b.apartment === localStorage.getItem('apartment');
                 // bookingElement.isOldBooking = bookingDate < todayDate;
                 bookingElement.isOldBooking = bookingElement.endTime < currentTime;
                 bookingElement.isTodayBooking = bookingDate.getTime() === todayDate.getTime();
@@ -230,7 +285,7 @@ export class WeekSchedule extends HTMLElement {
                 this.sessions[sessionKey].isMySession = bookingElement.isMyBooking;
                 this.sessions[sessionKey].isOldSession = bookingElement.isOldBooking;
                 this.sessions[sessionKey].isTodaySession = bookingElement.isTodayBooking;
- 
+
                 let slotElement = this.weekGrid.children('#' + b.year + '_' + b.month + '_' + b.day + '_' + b.hour);
 
                 if (slotElement.length > 0) {
@@ -239,7 +294,7 @@ export class WeekSchedule extends HTMLElement {
                 }
             });
 
-            const sortedSessions = Object.values(this.sessions).sort((a,b) => a.getStartTime() - b.getStartTime());
+            const sortedSessions = Object.values(this.sessions).sort((a, b) => a.getStartTime() - b.getStartTime());
             const allSessions = Object.values(this.sessions);
             allSessions.forEach(s => {
                 const sessionIndex = sortedSessions.findIndex(ss => ss.getStartTime().getTime() === s.getStartTime().getTime());
@@ -266,10 +321,13 @@ export class WeekSchedule extends HTMLElement {
     getBookings() {
 
         let fetchTask = new $.Deferred();
-    
-        window.dropbox.filesListFolder({path: '/bookings'})
+
+        // this.listAllFiles
+        this.listAllFiles(dropbox, '/bookings')
+            // window.dropbox.filesListFolder({path: '/bookings'})
             .then(data => {
-    
+
+
                 let bookings = data.result.entries
                     .filter(booking => booking.name.startsWith("slot_"))
                     .map(booking => {
@@ -281,15 +339,15 @@ export class WeekSchedule extends HTMLElement {
                             hour: booking.name.split('_')[5],
                             identifier: booking.name.split('_')[6]
                         };
-    
+
                         return bookingData;
                     });
-    
+
                 let duplicateBookings = data.result.entries
                     .filter(booking => booking.name.startsWith("slot_"))
                     .map(booking => {
                         // console.log(booking.name, booking.server_modified);
-                        return booking.name.split('_').slice(2,6).join('_')
+                        return booking.name.split('_').slice(2, 6).join('_')
                     })
                     .reduce((acc, el, i, arr) => {
                         if (arr.indexOf(el) !== arr.lastIndexOf(el)) {
@@ -298,24 +356,24 @@ export class WeekSchedule extends HTMLElement {
                         }
                         return acc;
                     }, {});
-    
+
                 Object.values(duplicateBookings).forEach(dbs => {
                     return dbs
                         .sort((a, b) => (new Date(a.server_modified) - new Date(b.server_modified)))
                         .reduce((res, db, i, array) => array.slice(1), [])
                         .forEach(db => {
                             console.log('deleting', db.path_lower);
-                            window.dropbox.filesDelete({path: db.path_lower}).then(() => { //delete when duplicates
+                            window.dropbox.filesDelete({ path: db.path_lower }).then(() => { //delete when duplicates
                                 console.log('duplicates deleted');
                                 weekSchedule[0].reload();
                             });
                         })
                 });
-    
+
                 fetchTask.resolve(bookings);
-    
+
             }, console.error);
-    
+
         return fetchTask;
     };
 
