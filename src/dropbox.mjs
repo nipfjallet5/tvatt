@@ -42,10 +42,10 @@ async function listAllFiles(dropbox, path) {
     while (hasMore) {
         if (cursor) {
             // If a cursor is available, continue from where we left off
-            response = await window.dropbox.filesListFolderContinue({ cursor });
+            response = await dropbox.filesListFolderContinue({ cursor });
         } else {
             // Initial request
-            response = await window.dropbox.filesListFolder({ path });
+            response = await dropbox.filesListFolder({ path });
 
         }
         reply.result.entries = [...reply.result.entries, ...response.result.entries];
