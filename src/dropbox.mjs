@@ -34,31 +34,31 @@ export function fetchEnc(name, password){
 // }
 
 async function listAllFiles(dropbox, path) {
-    let files = [];
     let hasMore = true;
     let cursor = null;
-  
+    let response;
+
+    const reply = {result: {entries: []}};
     while (hasMore) {
-      let response;
-      if (cursor) {
-        // If a cursor is available, continue from where we left off
-        response = await dropbox.filesListFolderContinue({ cursor });
-      } else {
-        // Initial request
-        response = await dropbox.filesListFolder({ path });
-      }
-  
-      files = files.concat(response.entries);
-      hasMore = response.has_more;
-  
-      // If there are more files, get the cursor to continue
-      if (hasMore) {
-        cursor = response.cursor;
-      }
+        if (cursor) {
+            // If a cursor is available, continue from where we left off
+            response = await window.dropbox.filesListFolderContinue({ cursor });
+        } else {
+            // Initial request
+            response = await window.dropbox.filesListFolder({ path });
+
+        }
+        reply.result.entries = [...reply.result.entries, ...response.result.entries];
+        hasMore = response.result.has_more;
+        if (hasMore) {
+            cursor = response.result.cursor;
+        }
+        else {
+            cursor = null;
+        }
     }
-  
-    return files;
-  }
+    return reply;
+}
 
 
 export class Booking {
@@ -155,7 +155,7 @@ async function getAllSessions(password) {
     const currentTime = new Date();
     const todayDate = new Date(currentTime.getFullYear(),0,0,0,0);
 
-    const data = await dropbox.listAllFiles({path: '/bookings'});
+    const data = await listAllFiles(dropbox, '/bookings');
     let laundrySessions = data.result.entries
         .filter(booking => booking.name.startsWith("slot_"))
         .map(booking => {

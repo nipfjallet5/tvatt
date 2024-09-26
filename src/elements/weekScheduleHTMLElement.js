@@ -86,18 +86,12 @@ export class WeekSchedule extends HTMLElement {
     }
 
     async listAllFiles(dropbox, path) {
-        let files = [];
         let hasMore = true;
         let cursor = null;
         let response;
 
         const reply = {result: {entries: []}};
         while (hasMore) {
-        // for (var i = 0; i < 10; i++) {
-            console.log(cursor);
-
-            // $('.slot-item').css({ 'background-color': 'pink' });
-
             if (cursor) {
                 // If a cursor is available, continue from where we left off
                 response = await window.dropbox.filesListFolderContinue({ cursor });
@@ -106,15 +100,8 @@ export class WeekSchedule extends HTMLElement {
                 response = await window.dropbox.filesListFolder({ path });
 
             }
-
-
             reply.result.entries = [...reply.result.entries, ...response.result.entries];
-            //   files = files.concat(response.entries);
-
             hasMore = response.result.has_more;
-            console.log(response);
-
-            // If there are more files, get the cursor to continue
             if (hasMore) {
                 cursor = response.result.cursor;
             }
@@ -122,12 +109,8 @@ export class WeekSchedule extends HTMLElement {
                 cursor = null;
             }
         }
-
-        // $('.slot-item').css({ 'background-color': '#e9e9e9' });
-
         return reply;
     }
-
 
     slide(direction) {
         let elementWidth = this.weekGrid.width();
