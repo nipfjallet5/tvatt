@@ -2,11 +2,11 @@ name: followup check
 # on: [push]
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-  schedule:
-    # - cron: "*/5 * * * *" #test
-    - cron: "10 */1 * * *"
+  # push:
+  #   branches: [main]
+  # schedule:
+  #   # - cron: "*/5 * * * *" #test
+  #   - cron: "10 */1 * * *"
 jobs:
   followup:
     runs-on: ubuntu-latest
